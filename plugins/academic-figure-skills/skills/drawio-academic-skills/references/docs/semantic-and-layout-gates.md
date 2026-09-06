@@ -58,11 +58,13 @@ Before typography, color, icons, or connector-label polishing, review a low-deta
 
 Record `layout.wireframe_gate.status` as:
 
-- `approved` when the structure was reviewed;
+- `approved` when the structure was actually reviewed and no required user decision remains; the agent may review geometry within settled semantics unless the user explicitly required personal approval;
 - `not_applicable` only for a genuinely simple, already-fixed edit, with a reason;
 - `pending` while semantics or layout remain unresolved.
 
 Strict or accepted manifest validation rejects a pending or absent gate. Approval freezes structure, not every pixel; later geometry edits may still improve spacing and routing without changing the semantic inventory.
+
+In `decision`, identify who reviewed the structure (`agent` or `user`), the source or prior decision that settles semantics, and the review result; point `review_artifact` to the inspected wireframe where available. An agent review must never be described as user approval. Preserve existing user approval when its scope remains valid. Structural geometry changes require another review, not another user question unless they change scientific meaning or the user requested that checkpoint. Never mark unresolved semantics as approved to pass validation.
 
 ## Supplemental Academic Issue Types
 

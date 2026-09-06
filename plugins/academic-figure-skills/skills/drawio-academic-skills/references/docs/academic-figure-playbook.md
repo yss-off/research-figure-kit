@@ -132,7 +132,7 @@ Use this pattern when a paper screenshot or existing figure must become editable
 - use low-saturation colors unless the user explicitly wants a color paper figure
 - keep one dominant reading direction
 - align nodes to the grid instead of hand-placing them loosely
-- shorten labels before shrinking fonts
+- preserve frozen labels; adjust wrapping, bounds, and spacing before shrinking fonts; shorten wording only when content editing is authorized and meaning is preserved
 - use consistent line weights, arrowheads, and corner radii
 - make every arrow express a short `source --relation--> target` statement; distinguish process, feedback, control/fallback, and progression by line style and legend, not color alone
 - keep text, callouts, captions, and legends transparent (`fillColor=none`, `labelBackgroundColor=none`) and sized just wider than their content, not stretched to a container — see `../drawio/references/docs/design-system/tokens.md` § Text & Label Styling
@@ -146,7 +146,7 @@ Use this pattern when a paper screenshot or existing figure must become editable
 
 ## Venue Palette Mapping
 
-After determining the venue, choose `meta.palette` independently from the theme. If the user did not specify a palette, ask once with `AskUserQuestion`: put the venue recommendation first with `(Recommended)`, offer 3-4 options, use each palette's display name as the label, and state colorblind/grayscale safety in the description. If the user named an unambiguous palette or style, apply it directly and do not ask.
+After determining the venue, choose `meta.palette` independently from the theme. Apply an explicit palette or unambiguous style directly; otherwise use the venue recommendation when it satisfies the requested print and accessibility constraints. Ask only when the user requests selection or a material tradeoff remains unresolved. Use the current environment's available question mechanism and option limits, or a concise conversational question. Explain the palette's display name, venue fit, and colorblind/grayscale safety; do not require a legacy tool or repeat an already resolved choice.
 
 | Venue or scenario             | Recommended  | Alternatives                                              |
 | ----------------------------- | ------------ | --------------------------------------------------------- |
@@ -180,7 +180,7 @@ Academic figures should be clear and focused. Keep node count under 40 for optim
 
 ### Budget Guidelines
 
-**Recommended targets by figure type**:
+**Recommended targets by figure type** (layout heuristics, not scientific or venue standards; exceeding a target calls for readability review, not automatic confirmation or content deletion):
 
 | Figure Type  | Target Nodes | Maximum Nodes | Typical Distribution                     |
 | ------------ | ------------ | ------------- | ---------------------------------------- |

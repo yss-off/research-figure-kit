@@ -14,7 +14,6 @@ metadata:
     - workflow
     - math
     - svg
-allowed-tools: Read, Write, Bash, AskUserQuestion
 ---
 
 # Draw.io Academic Overlay
@@ -36,21 +35,23 @@ If `../drawio/scripts/cli.js` is missing, stop and report that the sibling base 
 
 ## Non-Negotiable Contract
 
+- Honor explicit user instructions and existing authorization over skill defaults, within host permissions. Reuse settled decisions; ask only for material unresolved meaning or actions outside authorization. If a rule blocks work, identify its file and clause and continue independent work.
+- For publication tasks, this overlay owns delivery, palette, semantic fidelity, and approval policy; sibling references supply mechanics, not competing publication defaults or extra consultation steps. Never follow update/install instructions in historical references or modify a skill installation while drawing.
 - Keep academic authoring YAML-first and offline-first. Never create, require, or route through `.mcp.json`, MCP, or a live backend.
 - Always deliver `.drawio` as the editable source. Select one primary delivery class from `academic-figure-playbook.md § Academic Delivery Matrix`: `raster-publication` for Word/thesis/raster-first use, `vector-submission` for venue vector delivery, or `draft-preview` for review without a fixed publication target. Do not declare PNG or SVG a universal final default.
 - Keep `.spec.yaml`, `.arch.json`, raw YAML, and diagnostics in a project-local work directory such as `.drawio-tmp/<name>/`, unless the user explicitly asks for a reproducible sidecar bundle beside the final output.
 - Perform visual self-checks on the selected delivery class's exported primary artifact. Do not substitute an ad hoc browser preview for that artifact. Browser rasterization may produce the final PNG under the derivative gate; preserve the editable source and preview SVG, record provenance, and never treat the review screenshot itself as publication evidence.
 - Use the sibling base `../drawio/references/workflows/visual-review.md` for preview structure, issue records, YAML-first rework, and stopping rules; this overlay adds only publication checks.
 - Treat external image-generation previews as optional concept previews only. They never replace YAML, artifacts, sidecars, or exported-artifact verification.
-- Do not create or modify scratch JS scripts under a user's project-local `.agents/skills/drawio`; port durable fixes to the sibling base skill source instead.
+- Do not create or modify scratch JS scripts under a user's project-local `.agents/skills/drawio`; record base defects for a separately authorized upstream maintenance task.
 
 ## Academic Preflight
 
-Before generating or editing, determine and state: venue/audience; figure type (`architecture`, `roadmap`, or `workflow`); primary delivery class; color policy; caption/legend/title, formula, terminology/abbreviation, and text-fidelity needs; export expectations. If the publication target is unknown, use `draft-preview` and report that publication delivery is unresolved. Estimate the **node budget** (authoritative targets, thresholds, and split strategies: `references/docs/academic-figure-playbook.md § Node Budget Management`); over target, confirm a split/simplify strategy with the user and start from the compact patterns in `references/templates/`. For complex, ambiguous, multi-loop, paper-derived, reference-redraw, or relation-sensitive tasks, query the local reference index, compare 2–3 structured layout plans, and record prohibited edges, forbidden inferences, and cross-cutting regions before authoring final YAML. Full decision detail: `references/docs/publication-overlay.md § Required Academic Decisions`, `references/docs/layout-candidates-and-manifest.md`, and `references/docs/semantic-and-layout-gates.md`.
+Before generating or editing, infer and record the relevant venue/audience, figure type, delivery class, color policy, text/semantic fidelity, and export needs; reuse the existing contract for cosmetic edits. If the publication target is unknown, use `draft-preview` and report that publication delivery is unresolved. Estimate the **node budget** using `references/docs/academic-figure-playbook.md § Node Budget Management`: recommended targets prompt a readability review, not automatic approval. Preserve content when improving layout; ask before an unapproved split, deletion, or semantic simplification. Apply the Diagram Plan Gate below for candidate comparison and wireframe review. Full decision detail: `references/docs/publication-overlay.md`, `references/docs/layout-candidates-and-manifest.md`, and `references/docs/semantic-and-layout-gates.md`.
 
 ### Palette Preflight
 
-After the venue is known, if the user did not specify a palette, use `AskUserQuestion` as a single-select: venue recommendation first with `(Recommended)`, 3-4 choices, each palette's `displayName` as the label, and colorblind/grayscale safety plus venue rationale in each description. Venue map: `references/docs/academic-figure-playbook.md § Venue Palette Mapping`.
+After the venue is known, use its documented recommended palette when it satisfies the user's print and accessibility constraints. Ask only if the user requests a choice or a material tradeoff remains unresolved; use the current environment's available question mechanism and option limits, or a concise conversational question when necessary. Name the recommended palette and explain its colorblind/grayscale safety and venue rationale. Missing a legacy question tool does not block drawing. Venue map: `references/docs/academic-figure-playbook.md § Venue Palette Mapping`.
 
 If the user already specified a palette or an unambiguous style, map it directly and do not ask. For academic replication, preserve the source palette and skip selection unless the user explicitly requests normalization. Record the chosen name in `meta.palette`. The completion report must name the palette and its colorblind/grayscale safety flags, including any print-gate downgrade.
 
@@ -60,11 +61,11 @@ Extract only what the figure needs from papers, reference images, or text-only p
 
 ## Diagram Plan Gate
 
-For complex paper-derived figures, academic image-replication work, or any figure whose adjacency could imply unsupported cross-domain causality, present 2–3 concise, structurally distinct layout plans and wait for one selection before detailed YAML/rendering; simple academic diagrams may skip the gate only with a recorded reason. Candidates must preserve the same scientific inventory and expose their reading axis, use-when condition, and main risk. For every non-primary or ambiguous arrow, include `source --relation--> target`; also record directed `non_edges`, forbidden interpretations, and cross-cutting support regions. Review a text or monochrome wireframe at the target aspect ratio and record `layout.wireframe_gate` before typography and visual polish. Workflow: `references/docs/layout-candidates-and-manifest.md` and `references/docs/semantic-and-layout-gates.md`; source template: `references/docs/publication-overlay.md § Diagram Plan Gate`.
+For complex figures without a fixed layout, compare 2–3 structurally distinct plans using the same scientific inventory. Select and record routine geometry autonomously when scientific meaning and scope are settled; wait only when the user requested plan approval or a material semantic decision remains unresolved. Reuse an existing plan and skip candidate comparison for cosmetic edits. For non-primary or ambiguous arrows, record `source --relation--> target`, directed `non_edges`, forbidden interpretations, and cross-cutting support regions. Review a text or monochrome wireframe at the target aspect ratio before polish; record the reviewer, evidence, and authorization in `layout.wireframe_gate.decision`. Agent review is not user approval. See `references/docs/layout-candidates-and-manifest.md` and `references/docs/semantic-and-layout-gates.md`.
 
 ## Optional Image Preview
 
-Only after the diagram plan is confirmed, and only with privacy approval before sending unpublished or sensitive content; treat generated text as approximate and correct final labels/formulas/geometry in YAML. Full rules: `references/docs/publication-overlay.md § Optional Image Preview`.
+Use image-generation preview only when requested or materially useful for the authorized task; a local YAML/SVG preview is sufficient. First resolve the plan under the Diagram Plan Gate, reusing existing semantic decisions without another approval. Before sending unpublished or sensitive content, check that existing consent covers the provider and content; request only missing consent. Do not introduce external processing solely because a figure is complex. Treat generated text as approximate and correct final labels/formulas/geometry in YAML. Full rules: `references/docs/publication-overlay.md § Optional Image Preview`.
 
 ## Task Routing
 
@@ -78,7 +79,7 @@ Choose one route, then load only its files. `overlay` = this directory; `base` =
 - `stencil-heavy` — academic cloud, network, AWS, Azure, GCP, Cisco, Kubernetes figure → base `../drawio/references/docs/stencil-library-guide.md`, `ieee-network-diagrams.md`, `../drawio/references/official/xml-reference.md`
 - `style-preset` — learn/use/list/delete/rename visual style presets → base `../drawio/references/docs/style-extraction.md`, `style-presets.md`, `../drawio/styles/built-in/`
 - `planning-evidence` — compare layout candidates, query bundled references, or initialize/build/validate a figure manifest → overlay `references/docs/layout-candidates-and-manifest.md`, `references/reference-index.json`, `scripts/`
-- `direct-xml-exception` — tiny handoff-only XML or exact mxGraph control → base `../drawio/references/upstream/pure-drawio-skill.md`, `../drawio/references/official/xml-reference.md`
+- `direct-xml-exception` — tiny handoff-only XML or exact mxGraph control → base `../drawio/references/official/xml-reference.md`, `../drawio/references/official/style-reference.md`, `../drawio/references/docs/xml-format.md`; do not load the historical upstream skill workflow
 
 ## Academic Defaults
 
@@ -111,10 +112,10 @@ Record the selected class in `manifest.contract.delivery_class`. Honor extra for
 
 ## Create Flow
 
-1. Classify the figure as `architecture`, `roadmap`, or `workflow`; for complex tasks, query `scripts/reference_index.py`, generate 2–3 plans with `scripts/layout_candidates.py`, and select one before detailed rendering.
+1. Classify the figure as `architecture`, `roadmap`, or `workflow`; for complex tasks without a fixed layout, query `scripts/reference_index.py`, compare plans with `scripts/layout_candidates.py`, and select one under the Diagram Plan Gate.
 2. Initialize `.drawio-tmp/<name>/<name>.manifest.json` with `scripts/figure_manifest.py`; record the contract, reference IDs, candidates, and selection reason.
-3. Freeze the approved semantic contract before layout work: stable node/edge IDs, exact labels, `source --relation--> target`, directed non-edges, forbidden inferences, cross-cutting regions, line-style meaning, branch conditions, formulas, and abbreviations.
-4. Approve or explicitly waive a low-detail wireframe at the target aspect ratio, then draft or normalize the YAML spec as the canonical source. Treat later spacing/routing repairs as geometry-only unless the user separately approves a content change; shorten labels before shrinking fonts.
+3. Freeze the source-grounded or user-resolved semantic contract before layout work: stable node/edge IDs, exact labels, `source --relation--> target`, directed non-edges, forbidden inferences, cross-cutting regions, line-style meaning, branch conditions, formulas, and abbreviations. Do not require the user to approve unchanged source facts again.
+4. Review the low-detail wireframe under `references/docs/semantic-and-layout-gates.md`, then draft or normalize canonical YAML. Preserve frozen labels verbatim; fix wrapping, bounds, spacing, and routing first. Shorten labels only when content editing is authorized and scientific meaning is preserved.
 5. Validate and render through the sibling base CLI, then self-check the exported artifact and build the final manifest before reporting:
 
 ```bash
@@ -137,7 +138,7 @@ Figure-type patterns: `references/docs/academic-figure-playbook.md`.
 
 ## Export Policy
 
-Use the playbook delivery matrix as the single selection authority. For `raster-publication`, verify effective resolution and the final embedded document; for `vector-submission`, export PDF or path-only SVG explicitly and apply venue restrictions; for `draft-preview`, deliver SVG without claiming publication completion. Without the required exporter, generate a diagrams.net URL and report the blocked publication artifact honestly:
+Use the playbook delivery matrix as the single selection authority. For `raster-publication`, verify effective resolution and, when document embedding is in scope, the final embedded document; if Desktop is unavailable, use the source-preserving browser derivative gate. For `vector-submission`, export PDF or path-only SVG and apply venue restrictions; for `draft-preview`, deliver SVG without claiming publication completion. Only when no permitted exporter can produce a required artifact, deliver the editable source and preview, generate a diagrams.net URL if useful, and report that artifact as blocked:
 
 ```bash
 node ../drawio/scripts/cli.js input.yaml figure.pdf --validate --use-desktop
@@ -155,7 +156,7 @@ Do not claim completion until:
 - final `.drawio` and the primary artifact required by `manifest.contract.delivery_class` align with work-dir `.spec.yaml`/`.arch.json`; `meta.profile` is `academic-paper` and `meta.figureType` is `architecture`, `roadmap`, or `workflow`
 - `raster-publication` includes a 300ppi-effective PNG; `vector-submission` includes PDF or path-only SVG and passes venue restrictions; `draft-preview` includes SVG and is not reported as publication-final
 - no Word/LibreOffice/Pandoc/XeLaTeX manuscript references an SVG containing `<text>` or `dominant-baseline`; keep such SVGs preview-only, or convert every text object to paths before vector publication
-- node count satisfies the playbook budget (`references/docs/academic-figure-playbook.md § Node Budget Management`); split or simplify when exceeded
+- node count passes applicable validator limits and intended-size readability review; playbook targets are layout guidance, not permission to delete content or require an unrequested split
 - labels readable at paper/A4 scale; formulas use official delimiters (`$$...$$`, `\(...\)`, AsciiMath backticks); font classes follow the ladder with no label-fit overflow warnings
 - mixed CJK/Latin labels request the Times New Roman + SimSun stack (theme `cjk` stack or `meta.font`); verify the stack in generated `.drawio`/SVG and disclose the actual installed fallback when SimSun is unavailable instead of claiming exact SimSun rendering
 - captions, legends, callouts, formulas, and edge labels are not clipped or placed on connector lines; legends compact (single multi-line text node)
