@@ -15,7 +15,7 @@ Use this reference for complex, ambiguous, paper-derived, multi-loop, or referen
 
 ## When to compare candidates
 
-Generate 2–3 layout plans before authoring final YAML when any condition holds:
+When no suitable layout is already fixed, generate 2–3 layout plans before authoring final YAML when any condition holds:
 
 - the source is a paper, long technical description, or ambiguous reference image;
 - the figure mixes a primary process with capability, maturity, time, or evidence axes;
@@ -24,7 +24,7 @@ Generate 2–3 layout plans before authoring final YAML when any condition holds
 - the node budget or intended print width makes a split plausible; or
 - the user explicitly asks to compare layouts.
 
-Skip candidate comparison for a simple task whose node labels, relations, layout, and export target are already fixed. Do not turn a cosmetic edit into a redesign exercise.
+Reuse an already-fixed plan, and skip candidate comparison for cosmetic edits, regardless of node count. Record why comparison was unnecessary. Do not turn a cosmetic edit into a redesign exercise.
 
 Candidates are structured plans, not three polished figures. They must not change node labels, scientific relations, formulas, abbreviations, or evidence merely to look different.
 
@@ -86,7 +86,7 @@ main risk: ...
 reference prior: ...
 ```
 
-Recommend one candidate using the confirmed scientific argument, intended width, node budget, loop structure, and text density. Record the selected ID and reason. If each candidate would misrepresent an unresolved relation, stop and ask for that scientific relation instead of selecting on appearance.
+Select one candidate using the settled scientific argument, intended width, node budget, loop structure, and text density; record its ID and reason. The agent may select routine geometry. Wait only if the user explicitly requested plan approval or a material scientific decision remains unresolved; ask for that relation rather than a cosmetic preference. Reuse prior selections whose scope is unchanged.
 
 Once selected, freeze the semantic inventory before geometry work:
 
@@ -178,12 +178,12 @@ python scripts/figure_manifest.py build \
   --output .drawio-tmp/figure/figure.manifest.json --strict
 ```
 
-If Desktop is unavailable, record the requested PNG/PDF as `missing-evidence`, deliver the `.drawio` plus standalone SVG fallback, and do not claim a Desktop export.
+If Desktop is unavailable, apply `academic-figure-playbook.md § Academic Delivery Matrix`: raster publication may use the source-preserving browser derivative gate in `academic-export-checklist.md`; vector submission needs a permitted exporter for the accepted format; draft preview needs SVG. Record the actual renderer. Mark only artifacts that cannot be produced through a permitted path as `missing-evidence`, and deliver the available editable source and preview without claiming publication completion.
 
 ## Stopping rules
 
 - Compare at most three plans; more options usually duplicate layout families without adding evidence.
 - Select one plan before detailed YAML geometry. Do not fully render every candidate unless the user explicitly requests that cost.
-- Use the sibling visual-review limit of two autonomous repair rounds.
-- Stop when a correction needs a new scientific relation, content deletion, external data transfer, unavailable Desktop evidence, or a base-runtime change.
+- Follow the sibling visual-review progress check: reassess after two repair rounds, continue authorized reversible repairs with a concrete improvement path, and finish when required checks pass. A round count alone is not a reason to leave a fix unfinished.
+- Stop only the affected work when repeated attempts make no progress, a scientific decision remains unresolved, a content change or external transfer lacks authorization, no permitted export path can produce a required artifact, or a base-runtime change is needed. Continue independent work and report the specific missing decision or evidence.
 - If the defect belongs to the sibling base, record it as a base issue; do not vendor a private runtime patch into this overlay.

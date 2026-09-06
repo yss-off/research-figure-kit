@@ -52,11 +52,12 @@ Step 4: Parse Edit Instructions
 ├── Layout operations (rearrange / regenerate)
 └── Theme operations (switch theme)
 
-Step 5: Draft Modification & Confirm (For restructure)
-├── If the edit involves major structural reorganization:
-│   ├── Present the modified logical flow as an ASCII text-art graph
-│   └── Pause for user's confirmation before applying
-└── For minor edits (labels/colors/themes), proceed directly
+Step 5: Review Modification Scope
+├── For structural reorganization, review the proposed logical flow
+├── Reuse an existing authorization and proceed when meaning is settled
+├── Ask only for material unresolved meaning, an unapproved scope change,
+│   or a review checkpoint explicitly requested by the user
+└── For minor authorized edits, proceed directly
 
 Step 6: Apply Changes
 ├── Offline sidecar path -> update YAML, rerun CLI with --write-sidecars

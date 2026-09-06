@@ -76,7 +76,7 @@ No review record mutates files directly. Convert an accepted issue into the smal
 | add or change connector | Update the edge by stable ID or stable `from`/`to` pair. |
 | label change | Update the node or edge label without changing its ID. |
 | layout direction | Change `meta.layout`, then rerun layout and validation. |
-| clipped label | Shorten the label first; then apply the documented bounds/font ladder. |
+| clipped label | Preserve frozen or user-specified wording; adjust wrapping and apply the documented bounds/font ladder. Shorten only when content editing is authorized and meaning is preserved. |
 | edge-label overlap | Change `labelOffset`; keep the label on its edge. |
 
 If a `.spec.yaml` sidecar exists, edit it. If only a `.drawio` exists, import it to canonical YAML before iterative work. Direct XML editing is limited to the documented direct-XML exception or an imported diagram that cannot produce a usable sidecar; run XML validation after every such patch.
@@ -91,7 +91,7 @@ For each accepted round:
 4. Inspect PNG structure and dimensions, then perform visual review.
 5. Persist the new review record and compare it with the previous blockers.
 
-An autonomous round is complete only when validation ran, the preview is structurally valid and dimension-bounded, and every previous blocker is absent, downgraded with new evidence, or explicitly retained for user judgment. Run at most **2 autonomous repair rounds**. After that, return unresolved blockers to the user. After **5 user feedback rounds**, report remaining issues and recommend Desktop fine-tuning instead of claiming automatic completion.
+An autonomous round is complete only when validation ran, the preview is structurally valid and dimension-bounded, and every previous blocker is absent, downgraded with new evidence, or explicitly retained for user judgment. After two repair rounds, reassess the evidence and approach. Continue authorized, reversible repairs while there is a concrete path to improvement; stop as soon as the required checks pass. Stop the blocked portion when repeated attempts make no progress, a scientific or design decision is missing, or the next action exceeds authorization or the agreed budget. Report the unresolved issue, evidence, attempts, and needed decision while continuing independent work. Do not impose a fixed round limit on actionable user feedback or claim an unresolved defect is fixed.
 
 Final 300dpi embedded PNG/PDF/JPG/SVG exports remain separate deliverables. Produce them only after the preview/rework decision is complete; never overwrite a final artifact with a vision preview.
 
