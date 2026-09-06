@@ -5,7 +5,7 @@
 **Research figures you can edit, check, and reproduce.**
 
 [![CI](https://github.com/yss-off/research-figure-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/yss-off/research-figure-kit/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.3.2-2563EB)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.3.3-2563EB)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-0B7285)](LICENSE)
 [![Codex Plugin](https://img.shields.io/badge/Codex-plugin-111827)](plugins/academic-figure-skills/.codex-plugin/plugin.json)
 

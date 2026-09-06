@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.3 - 2026-09-06
+
+- 适配 GPT-6 Astra 的指令遵循行为，明确已有授权、科学决策与常规排版的边界；
+- 统一配色、方案选择、线框审查及修复轮次规则，避免重复确认和无条件停止；
+- 修复学术交付矩阵、Desktop 缺失回退及探索性数据图期刊核验的冲突；
+- 保留科学标签原文，清除直接 XML 路径中的历史静默更新指令；
+- overlay 更新为 0.1.2，scientific-visualization 更新为 1.2.1；bundled drawio 保留上游 2.7.0 标识，文档例外授权及补丁见 management/2026-09-06-astra-instruction-repair.md。
+
 ## 0.3.2 - 2026-09-04
 
 - 将公开仓库统一命名为 `research-figure-kit`，保留兼容的插件 ID 和三个 skill 名；
