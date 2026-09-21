@@ -13,10 +13,11 @@ Research Figure Kit 是一个面向 Codex 的开源科研配图插件工程。�
 - 明确的视觉、语义和出版检查；
 - 可追溯的来源、版本、artifact 和验证证据。
 
-项目内部保留三个独立 skill，由一个插件统一安装：
+项目内部保留四个独立 skill，由一个插件统一安装：
 
 - `drawio`：YAML-first、offline-first 的通用 draw.io 能力；
 - `drawio-academic-skills`：论文、学位论文和技术文档中的架构、机制、流程及路线图；
+- `drawio-poster`：品牌服务流程海报、手机阅读检查、简洁备注和局部修订；
 - `scientific-visualization`：基于 Matplotlib、Seaborn 或 Plotly 的数据剖析、统计视觉编码和出版导出审查。
 
 关系图和数据图共享发布治理，但不混用绘制后端：关系图始终保留可编辑 `.drawio`，数据图保留数值变量、变换和统计证据。

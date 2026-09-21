@@ -1,6 +1,6 @@
 {
   "skill_name": "drawio-academic-skills",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "_runner": "No automated runner. Each eval is a prompt plus an assertion checklist; verify manually or with an agent, assertion by assertion.",
   "evals": [
     {

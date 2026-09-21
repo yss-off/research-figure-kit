@@ -114,3 +114,40 @@ Return to wireframe comparison instead of continuing local repairs when any of t
 - typography and spacing repairs require moving the major process groups.
 
 Once structure changes again, reset the wireframe gate and repeat the semantic inventory comparison before detailed rendering.
+
+
+## Mechanism Comparison
+
+Apply this section when a figure compares a baseline with a proposed method to explain an improvement; ordinary cosmetic edits do not restart this review.
+
+### Establish the actual difference
+
+Use implementation evidence or settled author decisions to distinguish shared operations, added/changed operations, and omitted details. An operation absent from a simplified local baseline is not necessarily absent from the published method. Keep unsupported differences pending rather than letting the drawing establish a novelty claim.
+
+Use comparable abstraction levels across panels. When one panel expands a shared operation and the other compresses it, identify the shared operation with consistent naming or a compact note. Reserve change-emphasis styling for the supported modification; a more detailed panel must not imply a new mechanism.
+
+### Connect mechanism to consequence
+
+Place a grid, field, trajectory, or other explanatory sample at the stage that produces the represented object, or connect it with an explicit callout. The reader should be able to trace operation → representation → potential consequence without relying on a paragraph below the figure. Keep explanatory connectors distinguishable from computational data flow.
+
+Choose a domain-relevant example that exposes the claimed limitation. For a spatial-resolution argument, use the same reference shape, extent, and orientation in both panels; a diagonal or curved narrow structure may reveal contour approximation that an axis-aligned bar hides. Distinguish feature resolution, prediction formation resolution, and final display size. A resized output is not evidence of independent fine-grid predictions, and a finer grid alone does not guarantee recovery of missing information.
+
+Conceptual rasterization, illustrative contours, measured predictions, and ground truth are different evidence types. Identify the applicable type in a concise legend or accompanying caption and record it in provenance. Use conditional language for possible error modes; do not draw invented quantitative improvement or claim guaranteed recovery.
+
+### Keep explanation out of the footer when possible
+
+Prefer short local labels for the transformation and its consequence. Put derivations, implementation caveats, and extended evidence discussion in an accompanying caption or manuscript, while retaining the minimal key needed to interpret the figure. Do not append a block of audit notes merely because the manifest records them. If the user removes a footer, preserve its still-relevant scientific qualifications in the accompanying text or provenance; do not silently reinsert the deleted paragraphs.
+
+For a scoped deletion or wording edit, preserve unaffected node IDs, edges, and geometry; crop the canvas only as needed and inspect the resulting export. Reuse the canonical spec and existing rendering helpers instead of creating a new one-off script for each revision.
+
+### Review the representation, not just the graph
+
+A scientific reference trajectory is not a process connector. Grid strokes, cells, and invisible anchors are not conceptual modules. Separate semantic complexity from drawing-primitive count when interpreting node-budget and collision warnings; retain diagnostics and record specific reviewed exceptions rather than disabling validation globally. If the base cannot express the required primitive faithfully, record a minimal upstream reproduction instead of copying a renderer patch into the overlay.
+
+Before delivery, inspect the exported figure for three questions:
+
+- Can the reader point to the changed operation and distinguish it from shared context?
+- Is each illustrative sample visibly tied to the stage whose limitation it explains?
+- Can the reader tell what is conceptual and what was actually measured, with only the figure and its accompanying caption?
+
+These are review questions, not a new automatic PASS condition. File validity, visual acceptance, scientific evidence, and publication readiness remain separate judgments.

@@ -4,7 +4,8 @@
     "drawio-academic-skills",
     "scientific-visualization",
     "compose",
-    "clarify"
+    "clarify",
+    "drawio-poster"
   ],
   "cases": [
     {
@@ -90,6 +91,30 @@
       "prompt": "Make this academic figure clearer.",
       "expected_route": "clarify",
       "reason": "Without the source artifact or its semantic type, selecting a backend would be guesswork."
+    },
+    {
+      "id": "poster01",
+      "prompt": "Create a branded renewal-flow poster for customers to read in a chat group.",
+      "expected_route": "drawio-poster",
+      "reason": "Customer-facing conditions, prices, brand and mobile viewing select the poster overlay."
+    },
+    {
+      "id": "poster02",
+      "prompt": "Keep this service flow unchanged; enlarge our logo and shorten its footer note.",
+      "expected_route": "drawio-poster",
+      "reason": "A scoped branded poster revision preserves the semantic graph."
+    },
+    {
+      "id": "poster03",
+      "prompt": "This pricing flow poster looks ugly on my phone. Review it without editing.",
+      "expected_route": "drawio-poster",
+      "reason": "Read-only review of hierarchy and viewing-scale legibility; no implementation permission."
+    },
+    {
+      "id": "poster04",
+      "prompt": "Discuss whether customers can follow the conditions in this subscription poster; keep the original artwork for now.",
+      "expected_route": "drawio-poster",
+      "reason": "Poster meaning and design discussion must remain read-only."
     }
   ]
 }

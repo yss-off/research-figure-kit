@@ -13,8 +13,8 @@
 
 ## 权威源与安装边界
 
-- `plugins/academic-figure-skills/` 是自包含三-skill Codex 插件的唯一工程源；其 `skills/` 下的 `drawio/`、`drawio-academic-skills/`、`scientific-visualization/` 分别是通用 base、论文关系图 overlay、科研数据图的权威源。插件和三个 skill 名称保持兼容。
-- `pyproject.toml` 是工程、插件和三个 skill 的版本与路径清单唯一权威；插件 `.codex-plugin/plugin.json`、各 frontmatter/eval 必须同步，由 `tools/verify_project.py` 校验。读取清单获取当前版本，避免在本文件重复维护版本号。
+- `plugins/academic-figure-skills/` 是自包含 Codex 插件的唯一工程源；其 `skills/` 下的 `drawio/`、`drawio-academic-skills/`、`scientific-visualization/` 分别是通用 base、论文关系图 overlay、科研数据图的权威源。新增 `drawio-poster/` 承载非学术品牌流程海报；既有插件和三个 skill 名称保持兼容。
+- `pyproject.toml` 是工程、插件和各 skill 的版本与路径清单唯一权威；插件 `.codex-plugin/plugin.json`、各 frontmatter/eval 必须同步，由 `tools/verify_project.py` 校验。读取清单获取当前版本，避免在本文件重复维护版本号。
 - bundled `drawio` 固定为 `bahayonghang/drawio-skills` v2.7.0 commit `27dac02ce3b4901c844aaa623ad64c3d577c3a72`；来源同时记录于 `pyproject.toml` 和 `management/08-codex-plugin-refactor.md`，只通过固定权威上游 rebase 更新。若问题属于 base，记录证据并停止相关修改，不在 overlay 复制 runtime 修补。
 - `$CODEX_HOME/skills/` 和插件 cache 中的副本不是工程源。未经明确授权，不同步、覆盖、删除或安装运行副本；不把已安装的 `drawio` 当作回写目标。
 - 提交、推送、发布、外部写入、破坏性操作、付费或高成本计算须有用户明确授权。需要确认前，先完成已授权且不依赖该确认的准备与验证，使待批准结果可审阅。
@@ -43,7 +43,7 @@
 
 | 变更或交付 | 验证入口 |
 | --- | --- |
-| skill 行为或运行时脚本 | 聚焦检查后运行 `make test`（三 skill smoke 回归） |
+| skill 行为或运行时脚本 | 聚焦检查后运行 `make test`（各 skill smoke 回归） |
 | 触发、路由或跨 skill 边界 | `make test-routing` |
 | 版本、manifest、目录或工程结构 | `make check` |
 | base/overlay 接口或 draw.io 示例 | `make check-base`（含 example strict validation） |
