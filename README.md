@@ -5,7 +5,7 @@
 **Research figures you can edit, check, and reproduce.**
 
 [![CI](https://github.com/yss-off/research-figure-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/yss-off/research-figure-kit/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.3.3-2563EB)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.3.4-2563EB)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-0B7285)](LICENSE)
 [![Codex Plugin](https://img.shields.io/badge/Codex-plugin-111827)](plugins/academic-figure-skills/.codex-plugin/plugin.json)
 
@@ -25,6 +25,7 @@ Research Figure Kit is an open-source Codex plugin that treats a figure as an ev
 |---|---|---|---|
 | `drawio` | General diagrams, architecture, network topology, UML, flowcharts, and `.drawio` editing | YAML | Editable `.drawio`, SVG/PNG, validation diagnostics |
 | `drawio-academic-skills` | Paper, thesis, manuscript, and Word-facing architecture, mechanism, workflow, and roadmap figures | YAML + figure manifest | Layout alternatives, semantic gates, editable source, publication artifact |
+| `drawio-poster` | Branded service-flow posters, customer decision guides, mobile review and concise notes | YAML + revision evidence | Editable poster, viewing-size audit, measured text wrapping |
 | `scientific-visualization` | Numeric data, uncertainty, repeated units, missingness, statistical encoding, Matplotlib/Seaborn/Plotly | Data + plotting code + figure contract | Read-only profile, chart rationale, plot, export and QA evidence |
 
 ## Why it is different
@@ -116,6 +117,7 @@ GitHub Actions runs the portable test, routing, project, base-compatibility, and
 │   └── skills/
 │       ├── drawio/
 │       ├── drawio-academic-skills/
+│       ├── drawio-poster/
 │       └── scientific-visualization/
 ├── evals/                 # cross-skill routing cases
 ├── management/            # provenance and engineering decisions

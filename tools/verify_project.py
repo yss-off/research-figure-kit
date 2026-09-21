@@ -184,6 +184,12 @@ def required_files(config: SkillConfig) -> tuple[Path, ...]:
             config.path / "evals" / "evals.json",
             config.path / "scripts" / "figure_manifest.py",
         )
+    if config.kind == "poster-overlay":
+        return common + (
+            config.path / "agents" / "openai.yaml",
+            config.path / "references" / "poster-review.md",
+            config.path / "scripts" / "poster_tools.py",
+        )
     if config.kind == "scientific-plotting":
         return common + (
             config.path / "assets" / "publisher_profiles.json",
@@ -221,7 +227,7 @@ def validate_skill_structure(config: SkillConfig) -> dict[str, object]:
             raise VerificationError(
                 f"{config.name} eval version must match configured version {config.version}"
             )
-    elif config.kind in {"drawio-base", "scientific-plotting"}:
+    elif config.kind in {"drawio-base", "scientific-plotting", "poster-overlay"}:
         declared_version = frontmatter_field(config.path, "version")
         if declared_version != config.version:
             raise VerificationError(

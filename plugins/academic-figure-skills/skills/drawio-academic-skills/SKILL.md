@@ -59,6 +59,8 @@ If the user already specified a palette or an unambiguous style, map it directly
 
 Extract only what the figure needs from papers, reference images, or text-only prompts; keep uncertainties explicit. See `references/docs/publication-overlay.md § Source Understanding` and `references/docs/academic-figure-playbook.md § Scientific Figure Patterns`.
 
+For baseline-versus-proposed mechanism figures, also apply `references/docs/semantic-and-layout-gates.md § Mechanism Comparison`: verify shared mechanisms, connect the visual example to its generating stage, and separate conceptual illustrations from measured results.
+
 ## Diagram Plan Gate
 
 For complex figures without a fixed layout, compare 2–3 structurally distinct plans using the same scientific inventory. Select and record routine geometry autonomously when scientific meaning and scope are settled; wait only when the user requested plan approval or a material semantic decision remains unresolved. Reuse an existing plan and skip candidate comparison for cosmetic edits. For non-primary or ambiguous arrows, record `source --relation--> target`, directed `non_edges`, forbidden interpretations, and cross-cutting support regions. Review a text or monochrome wireframe at the target aspect ratio before polish; record the reviewer, evidence, and authorization in `layout.wireframe_gate.decision`. Agent review is not user approval. See `references/docs/layout-candidates-and-manifest.md` and `references/docs/semantic-and-layout-gates.md`.

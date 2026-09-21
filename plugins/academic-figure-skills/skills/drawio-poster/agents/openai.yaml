@@ -1,0 +1,6 @@
+interface:
+  display_name: "Branded Flow Posters"
+  short_description: "Design and revise readable, editable customer-facing flow posters"
+  default_prompt: "Create a branded flow poster with clear conditions, outcomes, and concise notes."
+policy:
+  allow_implicit_invocation: true
