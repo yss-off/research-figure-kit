@@ -67,7 +67,9 @@ Read `references/chart_selection.md`. Record a recommendation, evidence, assumpt
 - **Dual axes:** prefer aligned panels; if unavoidable, justify units and do not engineer apparent correlation.
 - **Images:** preserve originals, disclose whole-image adjustments, show scale bars, and avoid clipped/erased background.
 
-### 3. Design accessibility in, not after
+### 3. Research the task's visual style, then design accessibility
+
+Before coding a new figure or substantially restyling one, read `references/style_research.md`. Inspect task-matched figure precedents and applicable official guidance, then record a concrete style brief for layout, typography, colors, encoding, and target size. Journal names or presets alone are insufficient. Recheck and reuse a matching brief for small revisions; present the style proposal first when the user requested discussion. Keep plotting offline-capable and distinguish observations from publisher requirements.
 
 - Use color plus marker, line style, hatching, direct label, or panel separation.
 - Choose qualitative, sequential, diverging, or cyclic color according to data semantics.

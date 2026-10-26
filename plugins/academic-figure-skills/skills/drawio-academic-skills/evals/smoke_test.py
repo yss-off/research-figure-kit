@@ -15,6 +15,7 @@ SCRIPTS = SKILL_ROOT / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 
 from _common import CliError, atomic_write_json, sha256_file  # noqa: E402
+from test_audit_connectors import ConnectorAuditTests  # noqa: E402,F401
 from figure_manifest import (  # noqa: E402
     hydrate_artifacts,
     manifest_skeleton,
@@ -202,6 +203,37 @@ class ManifestTests(unittest.TestCase):
         for artifact in self.valid["render"]["artifacts"]:
             self.assertEqual(64, len(artifact["sha256"]))
             self.assertGreater(artifact["size_bytes"], 0)
+
+    def test_missing_evidence_cannot_satisfy_final_delivery(self) -> None:
+        for delivery_class, role in (("draft-preview", "svg"),
+                                     ("raster-publication", "png"),
+                                     ("vector-submission", "pdf"),
+                                     ("vector-submission", "svg")):
+            for status in ("accepted", "rendered"):
+                for verify in (False, True):
+                    with self.subTest(delivery_class=delivery_class, role=role,
+                                      status=status, verify=verify):
+                        document = copy.deepcopy(self.valid)
+                        document["status"] = status
+                        document["contract"]["delivery_class"] = delivery_class
+                        document["render"]["artifacts"][1] = {
+                            "role": role, "path": str(self.work / "absent"),
+                            "text_mode": "paths", "evidence_label": "missing-evidence",
+                        }
+                        report = validate_manifest(document, strict=True, verify_artifacts=verify)
+                        self.assertEqual("fail", report["status"])
+                        self.assertIn("delivery_artifact", {f["code"] for f in report["findings"]})
+        document = copy.deepcopy(self.valid)
+        document["render"]["artifacts"][0]["evidence_label"] = "missing-evidence"
+        self.assertEqual("fail", validate_manifest(document)["status"])
+
+    def test_planning_manifest_can_record_missing_artifacts(self) -> None:
+        document = manifest_skeleton("planning", "Unrendered figure", "architecture")
+        document["render"]["artifacts"] = [{
+            "role": "svg", "path": str(self.work / "absent.svg"),
+            "evidence_label": "missing-evidence",
+        }]
+        self.assertEqual("pass", validate_manifest(document, verify_artifacts=True)["status"])
 
     def test_known_bad_manifest_cases(self) -> None:
         fixture = load_fixture("manifest-known-bad.json")

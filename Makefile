@@ -1,6 +1,7 @@
 PYTHON ?= python3
 PLUGIN_ROOT := plugins/academic-figure-skills
 SKILLS_ROOT := $(PLUGIN_ROOT)/skills
+PLUGIN_VALIDATOR ?=
 
 .PHONY: test test-routing check check-base check-plugin package package-plugin package-skills package-base package-academic package-drawio package-scientific
 
@@ -20,7 +21,7 @@ check-base:
 	$(PYTHON) tools/verify_project.py --with-base
 
 check-plugin:
-	$(PYTHON) /home/yss/.codex/skills/.system/plugin-creator/scripts/validate_plugin.py $(PLUGIN_ROOT)
+	$(PYTHON) tools/verify_plugin.py "$(PLUGIN_ROOT)" $(if $(PLUGIN_VALIDATOR),--validator "$(PLUGIN_VALIDATOR)")
 
 package: package-plugin
 

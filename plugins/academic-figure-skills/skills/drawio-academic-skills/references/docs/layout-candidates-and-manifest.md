@@ -67,6 +67,8 @@ python scripts/reference_index.py \
 
 `references/reference-index.json` contains only overlay-bundled examples and templates covered by the overlay MIT license. Each entry has a stable ID, path, figure type, layout features, use/avoid guidance, source, and license.
 
+Bundled-index retrieval does not replace task-specific visual research. Follow `style-research-and-brief.md` before new authoring. Keep external observation-only sources in the task-local style brief or `reference_selection.style_sources`; do not add their artwork to the MIT-covered index. Record the brief path in `contract.style_brief` (these existing object fields permit extra metadata). This is an authoring record, not a new schema requirement or a machine-validated aesthetic score; old manifests remain compatible.
+
 Use the index as a retrieval layer, not a gallery to copy blindly:
 
 - adopt abstract layout features such as layering, branch convergence, compact legends, or stage compression;

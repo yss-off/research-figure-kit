@@ -405,8 +405,6 @@ def _validate_render(
         role = artifact.get("role")
         if role not in ARTIFACT_ROLES:
             _finding(findings, "artifact_role", f"{path}.role", f"unsupported role {role!r}")
-        else:
-            roles.add(role)
         evidence = artifact.get("evidence_label")
         if evidence not in EVIDENCE_LABELS:
             _finding(
@@ -419,6 +417,10 @@ def _validate_render(
         if not isinstance(artifact_path, str) or not artifact_path:
             _finding(findings, "artifact_path", f"{path}.path", "must be non-empty")
             continue
+        # A placeholder may be recorded during planning, but cannot satisfy a
+        # delivery requirement, even when file verification was not requested.
+        if role in ARTIFACT_ROLES and evidence in EVIDENCE_LABELS and evidence != "missing-evidence":
+            roles.add(role)
         if verify_artifacts and evidence != "missing-evidence":
             try:
                 source = checked_input_file(artifact_path)
@@ -591,6 +593,7 @@ def validate_manifest(
                 isinstance(item, dict)
                 and item.get("role") == "svg"
                 and item.get("text_mode") == "paths"
+                and item.get("evidence_label") in EVIDENCE_LABELS - {"missing-evidence"}
                 for item in artifacts
             )
             if "pdf" not in roles and not has_path_svg:
