@@ -58,6 +58,23 @@ For TWC wireless model architecture figures, also read
 conditioning/inset semantics and separate geometry/readability checks. Its
 design observations are not official TWC mandates.
 
+### Design before detailed drawing
+
+For a new complex figure or substantial redesign, use the existing
+`style-research-and-brief.md` and `layout-candidates-and-manifest.md` workflow:
+clarify the application and scientific graph → inspect task-matched figures →
+record a concrete layout/palette brief → render a complete low-detail wireframe
+at the intended size → refine color and geometry → inspect the actual export.
+When the composition is unsettled, compare materially different plans before
+polishing one. A local detail experiment is valid within its stated scope but
+does not validate omitted panels, cross-panel links or full-figure typography.
+Record that remaining work explicitly. Honor a user's discussion-first
+checkpoint; otherwise use existing authorization for routine reversible choices.
+Reuse a fitting approved brief for small edits rather than restarting research
+or requesting approval again. Source inspection, wireframe review, scientific
+fidelity, geometry checks, visual judgment and author acceptance are distinct
+pieces of evidence; a file or script PASS cannot substitute for them.
+
 ### Palette Preflight
 
 After style research, treat the playbook venue mapping as a local recommendation, not an official journal palette. Do not infer a black-white requirement from “IEEE” or “TWC” alone. Use the task-matched palette when it satisfies the user's print and accessibility constraints. Ask only if the user requests a choice or a material tradeoff remains unresolved; use the current environment's available question mechanism and option limits, or a concise conversational question when necessary. Name the recommended palette and explain its colorblind/grayscale safety and venue rationale. Missing a legacy question tool does not block drawing. Venue map: `references/docs/academic-figure-playbook.md § Venue Palette Mapping`.
@@ -76,7 +93,32 @@ figure.svg --orthogonal --strict --output /tmp/figure-connectors.json` and repai
 canonical YAML before rerendering. Unsupported SVG geometry requires renderer
 review; the helper does not certify scientific meaning or publication quality.
 
+## Exported geometry and acceptance
+
+For publication architecture/workflow figures, read
+`references/docs/geometry-acceptance.md`. Use the exported SVG's actual node,
+text-ink and arrow paint geometry, with explicit pair-specific containment
+exceptions. `audit_connectors.py` remains a landing-space helper, not the whole
+audit. Unknown/unmapped geometry must remain `review`.
+
+Accepted/strict manifests now replay `qa.geometry` against current SVG/scene/text
+metrics, bind the actual visual-review artifact hash, and require a separate
+current scientific/semantic review basis. Do not waive a collision to manufacture
+PASS. Diagnostic previews may still be delivered with visible unresolved issues;
+never present schema validation as scientific or visual certification.
+
 ## Source Understanding
+
+For overlay figures, follow `references/docs/review-contract.md`: maintain a
+claim–source–abstraction table before authoring, then record actual-artifact
+reading, source comparison and persistent issue history in `figure.review.json`.
+Manifest 1.1 accepted/strict delivery requires a current `qa.review` reference;
+old 1.0 records need explicit migration, never automatic approval. Keep current
+visual issues separate from history. Re-export invalidates affected evidence,
+including scientific SVG bindings. Initializers never perform or pass a review.
+Independent/isolated reading is optional; label informed self-checks honestly.
+Contract validation and hash matching do not establish scientific correctness
+or a reduced reviewer miss rate. Keep Python data plots on their own backend.
 
 Extract only what the figure needs from papers, reference images, or text-only prompts; keep uncertainties explicit. See `references/docs/publication-overlay.md § Source Understanding` and `references/docs/academic-figure-playbook.md § Scientific Figure Patterns`.
 
@@ -84,7 +126,7 @@ For baseline-versus-proposed mechanism figures, also apply `references/docs/sema
 
 ## Diagram Plan Gate
 
-For complex figures without a fixed layout, compare 2–3 structurally distinct plans using the same scientific inventory. Select and record routine geometry autonomously when scientific meaning and scope are settled; wait only when the user requested plan approval or a material semantic decision remains unresolved. Reuse an existing plan and skip candidate comparison for cosmetic edits. For non-primary or ambiguous arrows, record `source --relation--> target`, directed `non_edges`, forbidden interpretations, and cross-cutting support regions. Review a text or monochrome wireframe at the target aspect ratio before polish; record the reviewer, evidence, and authorization in `layout.wireframe_gate.decision`. Agent review is not user approval. See `references/docs/layout-candidates-and-manifest.md` and `references/docs/semantic-and-layout-gates.md`.
+For complex figures without a fixed layout, compare 2–3 structurally distinct plans using the same scientific inventory. Select and record routine geometry autonomously when scientific meaning and scope are settled; wait only when the user requested plan approval or a material semantic decision remains unresolved. Reuse an existing plan and skip candidate comparison for cosmetic edits. For non-primary or ambiguous arrows, record `source --relation--> target`, directed `non_edges`, forbidden interpretations, and cross-cutting support regions. For a new complex composition or substantial redesign, review a rendered low-detail complete wireframe at the target aspect ratio and intended physical size before polish; text plans may precede it. An explicitly requested local prototype keeps a partial review scope and leaves global integration unverified. Record the reviewer, evidence, scope and authorization in `layout.wireframe_gate.decision`. Agent review is not user approval. See `references/docs/layout-candidates-and-manifest.md` and `references/docs/semantic-and-layout-gates.md`.
 
 ## Optional Image Preview
 
@@ -181,6 +223,8 @@ Do not claim completion until:
 - no Word/LibreOffice/Pandoc/XeLaTeX manuscript references an SVG containing `<text>` or `dominant-baseline`; keep such SVGs preview-only, or convert every text object to paths before vector publication
 - node count passes applicable validator limits and intended-size readability review; playbook targets are layout guidance, not permission to delete content or require an unrequested split
 - the style brief records inspected sources and task-specific choices; review hierarchy, spacing, color restraint, and density separately from schema/export PASS; do not call a wireframe or palette “high-end” without inspecting the result
+- a new complex figure or substantial redesign has a task-matched design brief and a reviewed complete wireframe at intended size before detailed polish; a requested local prototype records its partial scope and leaves full integration unverified
+- palette roles are explicit and consistent across overview/detail panels, supported by labels/shapes; color accents alone do not assert methodological novelty
 - labels readable at paper/A4 scale; formulas use official delimiters (`$$...$$`, `\(...\)`, AsciiMath backticks); font classes follow the ladder with no label-fit overflow warnings
 - mixed CJK/Latin labels request the Times New Roman + SimSun stack (theme `cjk` stack or `meta.font`); verify the stack in generated `.drawio`/SVG and disclose the actual installed fallback when SimSun is unavailable instead of claiming exact SimSun rendering
 - captions, legends, callouts, formulas, and edge labels are not clipped or placed on connector lines; legends compact (single multi-line text node)

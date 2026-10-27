@@ -45,6 +45,13 @@ publisher-mandated style or a claim that an automatic router has been installed.
    results before fixing node coordinates. Prefer facing ports and direct paths
    or a short dogleg. First try modest spacing/alignment changes within the
    approved layout, rather than routing an adjacent relation around the page.
+   For adjacent source and target layers, compare aligning their ports and
+   using a vertical or horizontal straight connection before retaining a
+   diagonal inherited from a reference. Preserve the actual source-target
+   mapping, semantic grouping, readable spacing and arrow clearance; do
+   not force alignment if it creates collisions or hides meaning. Oblique
+   edges remain valid when they communicate geometry or better fit the
+   approved layout; this is a design preference, not an IEEE rule.
 3. Avoid unrelated objects, ambiguous junctions and coincident edge segments;
    then compare feasible routes for bends, length, border proximity and label
    association. These goals compete: do not minimize length at the expense of
@@ -61,6 +68,43 @@ publisher-mandated style or a claim that an automatic router has been installed.
    route from source to target at the intended reading size. Preserve a layout
    tradeoff as `review` when evidence is insufficient; zero crossings and the
    arrowhead audit alone do not close a routing complaint.
+
+## Acceptance check: direct input or justified detour
+
+Optimize the complete composition before the bend count. Preserve readable
+input spacing, label-to-object association, panel balance and author-approved
+placement. A direct route is preferable only when its required alignment does
+not worsen these properties or scientific meaning. Extra space and clear label
+ownership are legitimate reasons to keep a short dogleg even in an empty
+corridor. Do not move a tensor or stretch a panel merely to report more straight
+lines. If a straighter variant is less readable or the author prefers the
+previous balanced composition, retain that composition and record the tradeoff.
+
+For a local input-to-module connector, compare a horizontal/vertical direct
+route **after aligning its source and target ports** before accepting a dogleg.
+A small coordinate mismatch alone is not a reason to keep two bends. When a
+modest move is permitted, the direct corridor is clear and overall composition
+is preserved or improved, align the input or
+port, remove the waypoints in canonical YAML, and rerender. Check the whole
+exported path and arrowhead again; do not shorten only its final segment.
+
+For each affected bent connector in a routing review, record what the bends
+avoid or communicate (an obstacle, a label, a distinct input slot, a residual
+branch, a feedback corridor, input spacing, label association, or a frozen-layout constraint). If no purpose can
+be identified, the routing complaint remains open even if the geometry and
+arrowhead audits pass. This is a human layout acceptance check, not an automatic
+bend detector or an IEEE/TWC requirement. Do not impose a numeric bend limit.
+Retain useful residual and feedback paths; do not merge their semantics or
+force straight lines through obstacles just to reduce bends.
+
+Anonymous regression example: an input rectangle has a top exit at x=120;
+its consumer has a bottom entry at x=100, with no intervening object. The route
+(120,300) -> (120,250) -> (100,250) -> (100,200) is connected correctly but has
+an avoidable alignment detour. If moving the input is within scope, align its
+exit to x=100 and draw one upward arrow. Counterexample: a label or another
+module occupies that direct corridor, or a fixed port carries a distinct role;
+then preserve a clear routed connection and document why. These are local
+illustrative coordinates, not publisher thresholds.
 
 The existing `audit_connectors.py` checks arrowhead landing space and optional
 orthogonality only. It does **not** implement this route planner, detect all

@@ -100,9 +100,42 @@ Once selected, freeze the semantic inventory before geometry work:
 
 For relation-sensitive figures, also freeze directed `non_edges`, `forbidden_inferences`, and `cross_cutting_regions`. Then review a low-detail wireframe at the target aspect ratio and record `layout.wireframe_gate` as `approved`, `pending`, or `not_applicable` with a reason. A structural redesign resets this gate. See `semantic-and-layout-gates.md`.
 
+### Complete composition versus local experiment
+
+For a new complex figure or substantial redesign, render the selected
+low-detail composition before detailed styling. Include every panel and the
+actual cross-panel relations, intended output locations, representative label
+lengths and final-size font estimates. Review grouping, overview/detail
+correspondence, route corridors, whitespace and scientific meaning together;
+reviewing a component or merely listing candidate names is not this check.
+
+A user may request only a local experiment. Deliver it as such without silently
+expanding the task. Record the tested region and omitted integrations in the
+existing wireframe decision and residual risks. Use `pending` for a complete
+figure's wireframe gate when global composition is unverified; do not cite local
+approval, a context stub or a cropped print-size check as full-figure approval.
+A local prototype's own gate may be approved for its declared partial scope.
+When omitted panels are integrated later, review the full aspect ratio,
+parameter/feedback links and physical typography before detailed polish or
+whole-figure acceptance. A new integration invalidates only the decisions it
+affects, not every already-approved local detail.
+
+Separate the evidence: inspected sources support the brief; the wireframe tests
+composition; code/method checks test meaning; exported geometry tests its
+supported collisions; actual-artifact review tests readability. A manifest may
+record these reviews, but a record's existence or a strict-validation PASS does
+not prove aesthetics, author acceptance or venue compliance.
+
 A later layout-only repair may change bounds, waypoints, ports, and label offsets. It must not silently change this inventory.
 
 ## Figure-manifest contract
+
+New manifests use protocol 1.1 and final acceptance requires a hashed
+`qa.review` reference. The separate review record uses protocol 1.0. See
+[review-contract.md](review-contract.md) for source/claim mapping, caption/width
+binding, readback and issue history. Legacy manifest 1.0 can be inspected for
+diagnostics but cannot satisfy new final acceptance without explicit migration
+and the missing checks; `migrate` writes a new pending-review copy.
 
 Initialize an overlay-local manifest:
 

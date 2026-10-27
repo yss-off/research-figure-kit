@@ -1,14 +1,57 @@
 {
   "schema_version": "1.0",
   "checks": [
-    {"id": "reference-index-valid", "evidence": "smoke_test.py validates every indexed path, stable ID, and bundled license record"},
-    {"id": "layout-candidates-deterministic", "evidence": "12 fixture cases produce two or three structurally named plans without semantic rewriting"},
-    {"id": "manifest-known-bad", "evidence": "10 mutations must fail with their declared finding code"},
-    {"id": "manifest-artifact-integrity", "evidence": "accepted manifest hashes present artifacts, detects a later mismatch, and requires the primary artifact to match delivery_class"},
-    {"id": "no-implicit-overwrite", "evidence": "manifest output refuses an existing destination unless force is explicit"},
-    {"id": "existing-examples-strict", "evidence": "all bundled example and template YAML files pass sibling-base strict validation"},
-    {"id": "representative-forward-test", "evidence": "one bundled architecture example exports editable drawio plus standalone SVG and is visually inspected"},
-    {"id": "semantic-boundary-contract", "evidence": "anonymous manifest fixtures validate non-edges, forbidden inferences, cross-cutting support regions, and the wireframe approval gate"},
-    {"id": "installed-copy-unchanged", "evidence": "final installed-tree hash and latest mtime are recorded after validation; the latest installed mtime predates source implementation"}
+    {
+      "id": "reference-index-valid",
+      "evidence": "smoke_test.py validates every indexed path, stable ID, and bundled license record"
+    },
+    {
+      "id": "layout-candidates-deterministic",
+      "evidence": "12 fixture cases produce two or three structurally named plans without semantic rewriting"
+    },
+    {
+      "id": "manifest-known-bad",
+      "evidence": "10 mutations must fail with their declared finding code"
+    },
+    {
+      "id": "manifest-artifact-integrity",
+      "evidence": "accepted manifest hashes present artifacts, detects a later mismatch, and requires the primary artifact to match delivery_class"
+    },
+    {
+      "id": "no-implicit-overwrite",
+      "evidence": "manifest output refuses an existing destination unless force is explicit"
+    },
+    {
+      "id": "existing-examples-strict",
+      "evidence": "all bundled example and template YAML files pass sibling-base strict validation"
+    },
+    {
+      "id": "representative-forward-test",
+      "evidence": "one bundled architecture example exports editable drawio plus standalone SVG and is visually inspected"
+    },
+    {
+      "id": "semantic-boundary-contract",
+      "evidence": "anonymous manifest fixtures validate non-edges, forbidden inferences, cross-cutting support regions, and the wireframe approval gate"
+    },
+    {
+      "id": "installed-copy-unchanged",
+      "evidence": "final installed-tree hash and latest mtime are recorded after validation; the latest installed mtime predates source implementation"
+    },
+    {
+      "id": "review-contract-final-gate",
+      "evidence": "test_figure_review.py: current record, source comparisons, exact inventory coverage, actual artifact and viewing scope"
+    },
+    {
+      "id": "review-lifecycle-and-migration",
+      "evidence": "Explicit 1.0 migration resets judgments, new rounds preserve history; resolved issues require current verification"
+    },
+    {
+      "id": "review-invalidation",
+      "evidence": "Source/spec/SVG/caption/width mutations invalidate records; record rehash does not refresh context"
+    },
+    {
+      "id": "review-capability-boundary",
+      "evidence": "Self-consistent semantic error passes contract fixture; no reviewer-effectiveness claim"
+    }
   ]
 }

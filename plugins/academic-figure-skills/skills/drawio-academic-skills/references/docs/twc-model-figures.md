@@ -28,6 +28,18 @@ Public viewing is not artwork reuse permission. Keep these as observation-only r
 5. **Mark explanatory insets as explanations.** A patch-to-token inset can look like a detached computational branch if it has a calculation arrow but no connection back to the model. Identify it as a detail and state which operation it illustrates. Do not add a scientific edge just to remove the visual ambiguity. Keep schematic data glyphs visibly distinct from measured predictions, with their status in the caption.
 6. **Use hierarchy and restrained styling.** Differentiate panel headings, operation labels and auxiliary notes; align tensor-size annotations with the object they describe and keep transfer labels close to their arrows. Color is optional. If used, pair it with shapes, labels or line styles. Flat white/black or restrained color can both work; neither establishes journal fit by itself.
 
+## Overview-to-detail correspondence
+
+An expansion must identify the exact overview object it expands. A reference
+on an entire decoder container is insufficient when the detail describes just
+one repeated decoder-layer cell. Select a representative cell and use a shared
+visible identifier (or a short local callout) at that cell and the detail frame.
+Preserve grouping; do not imply a third processing stage or insert a computation
+arrow between panels merely to link the explanation. Repeated cells may share
+the same structure; highlighting one does not assert different parameters or
+processing. Any output head shown beside the expanded layer stays outside its
+frame and must not silently become part of the overview cell's identity.
+
 ## Review routes and arrows separately
 
 Read [connector-reliability.md](connector-reliability.md) for endpoint and route planning. A zero-crossing graph and a passing arrowhead helper are insufficient for visual approval.
@@ -35,6 +47,7 @@ Read [connector-reliability.md](connector-reliability.md) for endpoint and route
 - **Scientific correctness:** trace every source–relation–target; verify addition/multiplication order, residual tap location, conditioning inputs and parameter-transfer scope. A fork after a sum must not be drawn as if it came from the residual input. Check model code or the approved method contract when needed.
 - **Geometric correctness:** inspect actual text ink, target ports, marker direction, straight landing space, unrelated objects and unintended intersections/overlaps in the exported artifact. Review native-source/export parity separately.
 - **Human readability:** follow complete paths at intended size. Check detours, short initial doglegs as well as final legs, proximity to panel borders, ownership of labels and confusion between neighboring panels. Compare feasible routes for length and bends without claiming a mathematical optimum. A route's Manhattan-distance ratio alone ignores obstacles and cannot certify quality.
+- **Direct-input check:** judge panel balance, input spacing and label ownership before bend counts. Keep an author-preferred balanced composition when alignment worsens it. For a short dogleg feeding a nearby module, compare aligned ports and one straight arrow. Keep the bend only for an identified obstacle, distinct input role or approved layout constraint. Apply the acceptance check in `connector-reliability.md`; do not copy a reference diagram's detour after its surrounding layout has changed. This preference is not a TWC rule, and residual loops remain legitimate.
 - **Delivery quality:** inspect the actual PDF/PNG selected by the delivery contract, embedded fonts and final-size typography. Preserve the editable source. Keep schema validation, arrow-helper results, visual judgment, author acceptance and publisher compliance as distinct evidence.
 
 Report findings with locations and classify them as a connection/meaning error, a readability/layout issue, or an aesthetic preference. Do not manufacture hard errors from an untidy but correctly connected path. Keep unverified renderer or manuscript-placement checks visible. Numeric clearances used by a particular figure remain local QA heuristics; do not present them as TWC rules or universal plugin thresholds.

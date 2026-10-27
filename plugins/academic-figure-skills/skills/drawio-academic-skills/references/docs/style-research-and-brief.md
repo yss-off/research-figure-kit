@@ -14,6 +14,40 @@ For each new figure or substantial restyling:
 
 For small revisions, verify that an existing brief still fits the task and reuse it. Refresh research when the task, venue, medium, or figure type changes, or aesthetic rejection reveals the brief did not fit. If current external sources cannot be accessed, use inspected local precedents where possible and label remaining assumptions provisional; do not pretend research was completed or add a network dependency to the renderer.
 
+## Design for the application
+
+Turn the communication goal into choices before detailed authoring. Use the
+current task rather than a venue name as the design brief's organizing input:
+
+| Current figure need | Design decisions to resolve |
+| --- | --- |
+| Model overview with local detail | Which exact module is expanded; panel proximity; consistent glyphs; explanatory guides distinct from computational arrows |
+| Multi-stage training and inference | Which modules/parameters transfer; which stages run at inference; space for cross-stage connections |
+| Signal or image occupancy outputs | Input/feature/mask identities; independent channels; illustrative versus measured examples; display provenance |
+| Numerical results | Route to the scientific-visualization skill when appropriate; data, scales, uncertainty and comparison design precede styling |
+
+These are task examples, not fixed layouts or a new requirement to ask the user
+for every choice. Preserve the approved scientific graph. A reference can supply
+useful composition without supplying compatible model semantics.
+
+Use an application-specific palette role map: role → color → redundant visual
+cue. Assign meaning before exact hues, keep the mapping consistent across
+panels, and respect explicit palettes and source-replication constraints.
+Distinguish inputs, features, parameters and outputs only when it helps reading.
+Highlight focal designs with labels as well as color; an accent is not evidence
+of novelty. Record unresolved grayscale/CVD limitations honestly. Small edits
+reuse the approved mapping unless the task or readability changes.
+
+Before polishing a new complex composition, render a low-detail view of all
+panels at the planned aspect ratio and final width. Include global inputs,
+outputs, local-detail associations and cross-panel links. Use representative
+label lengths and physical font sizes: a tiny-label complete diagram is not
+validated by an enlarged crop. A requested partial wireframe can test a local
+question; record its extent and remaining integrations, then revisit the full
+composition before reporting whole-figure acceptance. Do not recolor around an
+unresolved composition problem. See the existing layout selection gate for the
+record and permission boundary.
+
 ## Brief record
 
 Store a short Markdown or YAML brief in `.drawio-tmp/<name>/style-brief.*`. For complex figures, add its path to `manifest.contract.style_brief` and optionally put observation-only source records in `manifest.reference_selection.style_sources`. Existing manifest object fields accept these records; they are not automatically enforced or graded by the manifest validator.
@@ -25,7 +59,10 @@ Minimum useful record:
 - adopted and rejected visual features, with reasons;
 - selected composition, font/size, palette/roles, connectors, spacing, and caption treatment;
 - applicable official rules vs local recommendations or provisional assumptions;
-- how the rendered figure will be checked at delivery size, including grayscale when relevant.
+- how the rendered figure will be checked at delivery size, including grayscale when relevant;
+- wireframe scope (complete figure or named local prototype), inspected artifact,
+  findings/decision, and any unverified integration or typography. The reviewer
+  and author-acceptance state must be stated separately.
 
 ## A TWC network overview example
 
