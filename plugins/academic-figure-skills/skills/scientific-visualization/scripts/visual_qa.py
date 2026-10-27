@@ -213,7 +213,10 @@ def render_preview(
     temporary = Path(temporary_name)
     try:
         temporary.unlink()
-        fig.savefig(temporary, format="png", dpi=float(dpi), bbox_inches=None)
+        import matplotlib as mpl
+
+        with mpl.rc_context({"savefig.bbox": None}):
+            fig.savefig(temporary, format="png", dpi=float(dpi), bbox_inches=None)
         if not temporary.exists() or temporary.stat().st_size == 0:
             raise CliError("Matplotlib produced no preview data")
         if destination.exists() and not overwrite:

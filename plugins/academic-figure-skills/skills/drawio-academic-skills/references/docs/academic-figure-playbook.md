@@ -150,6 +150,7 @@ After determining the venue, choose `meta.palette` independently from the theme.
 
 | Venue or scenario             | Recommended  | Alternatives                                              |
 | ----------------------------- | ------------ | --------------------------------------------------------- |
+| IEEE journal, color permitted | `ieee-color` | `tol-high-contrast`, `ieee-bw`; choose by task-specific style research |
 | IEEE print / camera-ready     | `ieee-bw`    | `tol-high-contrast`, `ieee-color`                         |
 | IEEE online / conference      | `ieee-color` | `matlab-lines`, `okabe-ito`                               |
 | Elsevier / general journal    | `okabe-ito`  | `tol-bright`, `tol-muted`, `seaborn-colorblind`           |
@@ -157,6 +158,8 @@ After determining the venue, choose `meta.palette` independently from the theme.
 | Chinese thesis (`cn-thesis`)  | `ieee-bw`    | `tol-high-contrast`, `journal-jama`                       |
 | Engineering architecture / C4 | `c4-blue`    | `cloud-aws`, `drawio-classic`                             |
 | Cloud architecture            | `cloud-aws`  | `c4-blue`                                                 |
+
+This table contains local starting points, not publisher-mandated colors. “IEEE” or “TWC” alone does not establish monochrome delivery. Check the actual medium and official constraints; color-permitted diagrams can use restrained accents with labels/line styles that remain intelligible in grayscale. An explicit monochrome contract takes precedence. Read `style-research-and-brief.md` before selecting a new style.
 
 For replication, preserve the source palette and skip this question unless the user explicitly asks to normalize or recolor the figure.
 
