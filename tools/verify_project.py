@@ -446,7 +446,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Verify the academic figure skills project.")
     parser.add_argument("--with-base", action="store_true")
     parser.add_argument("--base", type=Path)
-    parser.add_argument("--quick-validator", type=Path)
+    validators = parser.add_mutually_exclusive_group()
+    validators.add_argument("--quick-validator", type=Path)
+    validators.add_argument("--no-quick-validator", action="store_true",
+                            help="Use repository checks only; skip host validator discovery")
     return parser
 
 
@@ -455,7 +458,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         project, plugin, skills = load_project()
         validate_project_files(plugin)
-        validator = find_quick_validator(args.quick_validator)
+        validator = None if args.no_quick_validator else find_quick_validator(args.quick_validator)
         summary: dict[str, Any] = {
             "status": "pass",
             "project": project["name"],

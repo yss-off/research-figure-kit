@@ -5,7 +5,7 @@
 **Research figures you can edit, check, and reproduce.**
 
 [![CI](https://github.com/yss-off/research-figure-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/yss-off/research-figure-kit/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.3.4-2563EB)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.3.5-2563EB)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-0B7285)](LICENSE)
 [![Codex Plugin](https://img.shields.io/badge/Codex-plugin-111827)](plugins/academic-figure-skills/.codex-plugin/plugin.json)
 
@@ -104,7 +104,7 @@ make check-plugin   # portable repository manifest and skill-structure checks
 make package
 ```
 
-GitHub Actions runs the portable test, routing, project, base-compatibility, and deterministic-package checks. The generated plugin ZIP is attached to each successful CI run as an artifact.
+`pytest -q` runs the portable plugin checks, project smoke suites, routing, structure, base examples, and two independent package builds with byte-for-byte comparison. GitHub Actions runs this entry point once per Python version, then builds the downloadable plugin ZIP. The generated plugin ZIP is attached to each successful CI run as an artifact.
 
 To additionally run an installed external Python plugin validator, use
 `make check-plugin PLUGIN_VALIDATOR=/absolute/path/to/validate_plugin.py`.
