@@ -120,3 +120,7 @@ make package             # 生成确定性插件 ZIP
 本项目使用 [MIT License](LICENSE)。bundled `drawio` 固定自 `bahayonghang/drawio-skills@27dac02` v2.7.0；`scientific-visualization` 包含对 K-Dense AI `scientific-agent-skills` 的适配。完整归属、许可证文本和内嵌第三方组件说明见 [THIRD_PARTY_NOTICES.md](plugins/academic-figure-skills/THIRD_PARTY_NOTICES.md)。
 
 项目和插件版本见 [pyproject.toml](pyproject.toml)，变更记录见 [CHANGELOG.md](CHANGELOG.md)。
+
+### 0.3.5 升级提示
+
+严格验收现在统一检查出版证据与审查快照完整性；旧记录若缺少必要上下文，需保留原件并为当前图重新审查。具体迁移边界见 [CHANGELOG](CHANGELOG.md)。`pytest -q` 统一执行插件、smoke、路由、工程结构、base 示例及两次独立打包一致性检查。
