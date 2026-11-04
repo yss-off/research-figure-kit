@@ -50,10 +50,10 @@ This combines academic typography and line treatment with Okabe-Ito category col
 ```text
 Was a palette explicitly named?
   yes -> apply it directly; do not ask
-  no  -> does the request mention palette/color choice, colorblind safety,
-         grayscale or black-and-white printing, or multi-category distinction?
-           yes -> ask once with 3-4 relevant palette choices
-           no  -> omit meta.palette and keep the theme defaults
+  no  -> preserve the theme, or choose a documented palette satisfying the
+         stated print, accessibility, and category constraints
+         Ask through the available host mechanism only for a requested choice
+         or an unresolved material tradeoff; reuse an already resolved choice
 
 Replicate route?
   yes -> preserve source colors and skip palette selection unless the user

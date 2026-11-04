@@ -61,7 +61,7 @@ Map the result to the existing `meta.figureType` contract:
 
 When the source is a research model, mechanism, or experiment, turn the evidence chain into a compact figure plan before drafting YAML. The figure-type pattern library (model architecture, operation/mechanism, experiment pipeline, scholarly framework redraw — each with its YAML emphasis) lives in `academic-figure-playbook.md § Scientific Figure Patterns`; use it rather than re-deriving patterns here.
 
-For complex, ambiguous, multi-loop, paper-derived, or reference-redraw tasks, use `layout-candidates-and-manifest.md`: query the local reference index, compare 2–3 structurally distinct plans, record one selection, and then freeze the semantic inventory. These plans may change layout family and routing intent, but they must keep labels, relations, formulas, abbreviations, and evidence unchanged.
+For complex tasks without an already-fixed layout, use `layout-candidates-and-manifest.md`: query the local reference index, compare 2–3 structurally distinct plans, record one selection, and freeze the semantic inventory. Reuse settled plans for cosmetic edits. Plans may change layout family and routing intent, but must keep labels, relations, formulas, abbreviations, and evidence unchanged.
 
 Prefer an architecture figure for static relationships and a workflow figure for ordered operations. Do not invent a new `meta.figureType` when the existing three values can express the paper role.
 
@@ -83,7 +83,7 @@ Do not force every item into the figure. Include the items that explain the pape
 
 ## Diagram Plan Gate
 
-For complex paper-derived figures, ambiguous diagrams, or academic image-improvement work, confirm a diagram plan before rendering. Use this template:
+For complex figures without a fixed plan, record the plan before rendering. Select routine geometry autonomously when semantics and scope are settled. Ask only for an unresolved scientific relation, an unapproved content change, or a plan approval explicitly requested by the user; do not repeat an existing approval. Use this template:
 
 ```text
 Source type:
@@ -98,17 +98,19 @@ Preview path:
 Terms needing confirmation:
 ```
 
-Skip this gate only for simple academic diagrams where the user already gave the figure type, labels, layout, and export expectations clearly.
+Reuse an existing plan for fixed-layout or cosmetic edits, with a recorded reason. A complex figure may still require agent wireframe review; this is not automatically another user approval gate. See `semantic-and-layout-gates.md` for reviewer and evidence recording.
 
 ## Content Compression
 
-Academic figures should not copy paragraphs into boxes. Compress source text into:
+When authoring from prose and content summarization is in scope, compress source text into:
 
 - noun phrases for modules,
 - verb phrases for arrows,
 - short method labels for algorithm or experiment steps,
 - short result labels for validation or findings,
 - one-line notes for assumptions, constraints, or limitations.
+
+For replication, frozen labels, or layout-only edits, preserve exact wording and use wrapping, bounds, and spacing. Content compression is not authorization to rename scientific terms or remove evidence.
 
 Prefer 4-8 major modules and 2-5 supporting nodes per major section. Use one dominant reading path and only 1-2 feedback loops unless the source genuinely requires more.
 
@@ -124,17 +126,17 @@ Captions, callouts, legends, and annotation labels follow the base rule in `../d
 
 ## Optional Image Preview
 
-Use external image-generation preview by default for:
+Consider an authorized external image-generation preview when it materially helps the requested result, for example:
 
 - complex paper-derived figures with non-obvious layout or hierarchy,
 - reference-image redraws where the user wants academic improvement rather than literal replication,
-- proposal/thesis/manuscript figures where visual composition needs approval before YAML work.
+- proposal/thesis/manuscript figures where the user requested a visual composition comparison before YAML work.
 
-Skip external image-generation preview for simple, straightforward academic diagrams and proceed directly to YAML/SVG.
+Local YAML/SVG preview is sufficient for simple or complex diagrams. Complexity alone does not require external generation or another approval. Resolve the plan under the Diagram Plan Gate and reuse existing semantic decisions; do not equate agent layout review with user approval.
 
 Privacy rules:
 
-- Ask before sending unpublished papers, confidential reports, proprietary data, or sensitive research content to an external model.
+- Before sending unpublished papers, confidential reports, proprietary data, or sensitive research content to an external model, verify that existing explicit consent covers the provider and content. Ask only for missing consent; the drawing request alone does not authorize an uncovered sensitive upload.
 - Prefer sending the confirmed diagram plan, short labels, layout intent, and visual style constraints instead of raw source documents.
 - If the user declines external processing, no image tool is available, or generation fails, fall back to local YAML/SVG preview.
 

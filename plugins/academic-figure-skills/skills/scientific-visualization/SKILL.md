@@ -4,7 +4,7 @@ description: Create and audit truthful, accessible, publication-ready scientific
 license: MIT
 allowed-tools: Read Write Edit Bash Glob Grep
 metadata:
-  version: "1.2"
+  version: "1.2.1"
   skill-author: K-Dense Inc.
 ---
 
@@ -16,9 +16,10 @@ Runtime: Python 3.11+ and `uv` for pinned examples. Bundled CLIs are network-fre
 
 ## Non-negotiable guardrails
 
+- User instructions and existing authorization take precedence over skill defaults within host permissions. Infer routine presentation choices, reuse settled decisions, and ask only for material unresolved scientific meaning or actions outside authorization; explain the specific rule if it blocks work.
 - Never alter, hide, invent, or selectively enhance data to improve a figure.
 - Preserve raw tables/images, exclusions, missing-value codes, analysis code, normalization, binning, image adjustments, and random seeds.
-- Do not infer journal requirements. Identify the exact journal, article type, figure type, and submission phase; verify its live official guidance.
+- When journal-specific delivery is requested, identify the exact journal, article type, figure type, and submission phase and verify its live official guidance. Otherwise use a provisional general profile; do not invent publisher requirements or make their absence block exploratory work.
 - Do not claim that a palette, DPI value, format, or automated report makes a figure accessible or journal-compliant.
 - Do not silently connect missing observations, suppress inconvenient points, upsample images as if detail increased, or tune axes/dual axes to exaggerate a conclusion.
 - Keep interactive and static outputs as distinct deliverables. Interactive hover is not a substitute for labels, alt text, keyboard access, an accessible data table, or a static fallback.
@@ -66,7 +67,9 @@ Read `references/chart_selection.md`. Record a recommendation, evidence, assumpt
 - **Dual axes:** prefer aligned panels; if unavoidable, justify units and do not engineer apparent correlation.
 - **Images:** preserve originals, disclose whole-image adjustments, show scale bars, and avoid clipped/erased background.
 
-### 3. Design accessibility in, not after
+### 3. Research the task's visual style, then design accessibility
+
+Before coding a new figure or substantially restyling one, read `references/style_research.md`. Inspect task-matched figure precedents and applicable official guidance, then record a concrete style brief for layout, typography, colors, encoding, and target size. Journal names or presets alone are insufficient. Recheck and reuse a matching brief for small revisions; present the style proposal first when the user requested discussion. Keep plotting offline-capable and distinguish observations from publisher requirements.
 
 - Use color plus marker, line style, hatching, direct label, or panel separation.
 - Choose qualitative, sequential, diverging, or cyclic color according to data semantics.
@@ -190,7 +193,7 @@ Read `references/visual_review.md` and keep three layers separate:
 
 Run `scripts/font_preflight.py` before rendering CJK/math-heavy labels. Call `visual_qa.audit_figure(fig)` and render a preview before final export. Automated checks cover only declared properties and never establish scientific or visual correctness.
 
-Apply at most two automatic correction rounds. Re-run affected checks after each correction; then stop and report unresolved evidence or request the scientific choice needed. Finally inspect file metadata, compare against a dated publisher snapshot, view the figure in its manuscript/web context, and re-check the live journal page immediately before upload.
+Use the progress-based revision loop in `references/visual_review.md`; inspect final file metadata and, when supplied and in scope, the manuscript/web context. For a specified journal, compare against the relevant dated snapshot and live official guidance; re-check immediately before an authorized upload. For exploratory figures, finish with a provisional general profile and record publisher verification as pending or not applicable without blocking delivery.
 
 ## Pinned snapshot
 
@@ -336,5 +339,5 @@ Matplotlib style files omit `#` in hex colors because `#` begins comments in `.m
 - [ ] Color is redundant and rendered contrast was reviewed.
 - [ ] Figure has an accessible description/data alternative where applicable.
 - [ ] Physical dimensions, DPI, format, fonts, transparency, and file size were inspected after export.
-- [ ] Publisher rules were verified for the exact journal and phase.
+- [ ] For journal-specific delivery, publisher rules were verified for the exact journal and phase; otherwise this check is explicitly pending or not applicable and the general figure is not claimed as submission-ready.
 - [ ] No automated report is presented as a scientific, accessibility, or compliance certification.

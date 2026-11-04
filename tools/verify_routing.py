@@ -19,12 +19,14 @@ SCIENTIFIC_TRIGGERS = (
     / "trigger_cases.json"
 )
 EXPECTED_ROUTES = {
+    "drawio-poster",
     "drawio-academic-skills",
     "scientific-visualization",
     "compose",
     "clarify",
 }
 MINIMUM_COUNTS = {
+    "drawio-poster": 4,
     "drawio-academic-skills": 5,
     "scientific-visualization": 5,
     "compose": 2,

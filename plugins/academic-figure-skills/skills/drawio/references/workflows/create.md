@@ -26,9 +26,9 @@ Determine the route before asking questions:
 2. **Full Path**
    - Use for ambiguous, large, academic, replication-like, or routing-sensitive diagrams.
 3. **Academic Branch**
-   - Force-enable when prompt contains `paper`, `academic`, `IEEE`, `journal`, `thesis`, `figure`, `manuscript`, `research`.
-   - Default `meta.profile = academic-paper`.
-   - Classify the figure as `architecture`, `roadmap`, or `workflow` before final layout and set `meta.figureType`.
+   - Route publication-facing requests to the sibling `drawio-academic-skills` overlay.
+   - Generic words such as `figure` or `research` alone do not establish publication intent.
+   - Use this workflow only for mechanics under overlay policy; if the overlay is absent, render the offline bundle and disclose that publication policy was not applied.
 4. **Scientific Diagram Branch**
    - Enable when the prompt mentions model architecture, CNN, YOLO, Transformer, encoder-decoder, attention, feature fusion, algorithm mechanism, ablation, experiment pipeline, or research framework.
    - Keep this branch in the base skill unless the request is publication-facing; route paper/thesis/journal/manuscript requests through the Academic Branch.
@@ -78,7 +78,7 @@ Step 5: Decide Fast Path vs Full Path
 └── Full Path -> continue to Step 6
 
 Step 6: Design Consultation (Full Path only)
-├── Ask only unresolved questions:
+├── Infer routine presentation choices; ask only for material unresolved meaning:
 │   • audience/profile
 │   • theme
 │   • layout
@@ -89,8 +89,8 @@ Step 6: Design Consultation (Full Path only)
 
 Step 7: Academic / Math / Stencil references
 ├── math/formula request -> load math typesetting + formula integration guide
-├── academic-paper -> load academic figure playbook + export checklist + IEEE + math typesetting
-├── scientific model/operation request -> consult academic figure playbook patterns even when profile is non-academic
+├── academic-paper -> use sibling academic overlay routing and delivery rules
+├── scientific model/operation request -> use the scientific branch and base examples; load math references only when formulas are present
 └── stencil-heavy -> decide whether shape search is needed
     ├── if `search_shape_catalog` exists, use it for exact vendor/device lookup
     └── otherwise use design-system icons or semantic fallbacks
@@ -134,8 +134,8 @@ Step 11: Edge Audit
 
 Step 12: Render
 ├── node <skill-dir>/scripts/cli.js input --input-format <yaml|mermaid|csv> output.drawio --validate --write-sidecars --sidecar-dir .drawio-tmp/output
-├── For paper-quality diagrams prefer output.svg --validate --write-sidecars --sidecar-dir .drawio-tmp/output
-├── For thesis / A4 / Word / PNG requests, add a matching PNG only when draw.io Desktop export is available
+├── For publication tasks, use the sibling overlay delivery matrix and permitted exporter fallbacks
+├── For general diagrams, use the active base skill delivery defaults
 ├── Note: standalone SVG (without --use-desktop) replays anchors/waypoints and approximates orthogonal routes (L/Z bends).
 │   For exact Desktop routing (jetty spacing, obstacle avoidance), add --use-desktop or refine in draw.io.
 └── When embedded export matters and draw.io Desktop exists, add --use-desktop for SVG or export to PNG/PDF/JPG
@@ -148,22 +148,12 @@ Step 13: Exported-Artifact Verification / Optional Live Handoff
 ├── live backend has `replace_diagram_xml` + user wants browser or inline refinement
 │   └── use the provider-specific tool mapping from `references/docs/mcp-tools.md`
 ├── browser/live screenshots are a last-resort review aid only when the user explicitly requested live review and no exported artifact can be inspected
-└── otherwise present .drawio + standalone SVG and report any remaining manual visual check
+└── deliver the active skill's required artifacts; disclose unavailable formats and missing visual evidence
 ```
 
 ## Academic Branch Rules
 
-When `meta.profile = academic-paper`:
-
-- `meta.figureType` is required and must be exactly `architecture`, `roadmap`, or `workflow`.
-- `meta.title` is required for figure captioning.
-- `meta.description` is recommended for figure context.
-- `meta.legend` is required when icons are used or connector types are mixed.
-- Prefer `academic` theme unless the request explicitly asks for a color paper figure.
-- Default final deliverables are `.drawio` and `.svg`; keep `.spec.yaml` and `.arch.json` in a project-local work directory unless a sidecar bundle is explicitly requested.
-- Add `.png` only for thesis, A4, Word, raster-first, screenshot rebuild, or explicit PNG requests.
-- Do not rely on color alone to distinguish semantics.
-- Treat A4 readability and grayscale print safety as final review gates, not optional polish.
+For publication work, follow the sibling academic overlay and its `academic-figure-playbook.md` delivery matrix. It owns figure type, palette, caption, print, semantic approval, and permitted exporter fallback policy. Do not impose another universal SVG/PNG default or user confirmation step from this base workflow. If the overlay is unavailable, deliver the general offline bundle and explicitly leave publication validation unresolved.
 
 ## Scientific Diagram Rules
 

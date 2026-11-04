@@ -32,6 +32,11 @@
 顶层允许字段，并把版本与固定提交记录到 `metadata`。未改写 base CLI、schema、renderer、
 themes、palettes 或 shared workflows。
 
+2026-09-06 补充：用户明确授权一次 base 文档修复例外，已应用 Astra 指令补丁。
+上述“未改写 shared workflows”描述的是首次导入状态；当前指令文档存在本地修订，
+CLI、schema、renderer、themes 和 palettes 仍未因此变更。授权、补丁及验证见
+[Astra 指令修复记录](2026-09-06-astra-instruction-repair.md)；后续 rebase 需核对这些修订。
+
 Codex plugin ingestion 只接受 skill `agents/openai.yaml` 的 `interface`、`policy` 和
 `dependencies` 顶层字段，因此 bundled base 和 academic overlay 原有的说明性
 `capabilities`、`prerequisites` 被移除；必要前置条件仍保留在各自 `SKILL.md`。上游

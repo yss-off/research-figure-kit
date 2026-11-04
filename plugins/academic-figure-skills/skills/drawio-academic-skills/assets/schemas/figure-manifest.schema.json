@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://local.invalid/drawio-academic/figure-manifest-1.0.schema.json",
+  "$id": "https://local.invalid/drawio-academic/figure-manifest-1.1.schema.json",
   "title": "Draw.io Academic Figure Manifest",
   "type": "object",
   "required": [
@@ -17,7 +17,7 @@
     "provenance"
   ],
   "properties": {
-    "schema_version": {"const": "1.0"},
+    "schema_version": {"enum": ["1.0", "1.1"]},
     "figure_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
     "title": {"type": "string", "minLength": 1},
     "status": {"enum": ["planning", "rendered", "review", "accepted"]},
@@ -105,7 +105,22 @@
     },
     "reference_selection": {"type": "object"},
     "render": {"type": "object"},
-    "qa": {"type": "object"},
+    "qa": {
+      "type": "object",
+      "properties": {
+        "review": {
+          "type": "object",
+          "required": ["path", "sha256", "schema_version"],
+          "properties": {
+            "path": {"type": "string", "minLength": 1},
+            "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+            "schema_version": {"const": "1.0"}
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": true
+    },
     "provenance": {"type": "object"}
   },
   "additionalProperties": false

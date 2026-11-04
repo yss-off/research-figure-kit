@@ -28,7 +28,7 @@ Use this checklist for paper or manuscript figures containing feedback, fallback
 ## Labels and Conditions
 
 1. Omit an edge label when it only repeats the source or target node text.
-2. Keep a branch condition on the edge when the relation would otherwise be ambiguous. First shorten it and move it with `labelOffset` into whitespace.
+2. Keep a branch condition on its edge when the relation would otherwise be ambiguous. Preserve frozen wording; move it with `labelOffset` and adjust wrapping or corridor spacing. Shorten only when content editing is authorized and the condition's meaning is preserved.
 3. If no clean label corridor exists, place the condition in the decision outcome or destination node, or explain it in the legend/caption, but only when the arrow relation remains unambiguous.
 4. Inspect for duplicated condition text, labels sitting on dashed segments, and labels that become detached from their branch after scaling.
 5. Treat every edge label as owned by exactly one connector. Put a condition near the branch point or on a uniquely traceable straight segment, not midway between two boxes or loops where it can be mistaken for a node annotation or for a different edge.

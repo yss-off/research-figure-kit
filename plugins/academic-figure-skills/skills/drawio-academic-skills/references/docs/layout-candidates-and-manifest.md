@@ -15,7 +15,7 @@ Use this reference for complex, ambiguous, paper-derived, multi-loop, or referen
 
 ## When to compare candidates
 
-Generate 2–3 layout plans before authoring final YAML when any condition holds:
+When no suitable layout is already fixed, generate 2–3 layout plans before authoring final YAML when any condition holds:
 
 - the source is a paper, long technical description, or ambiguous reference image;
 - the figure mixes a primary process with capability, maturity, time, or evidence axes;
@@ -24,7 +24,7 @@ Generate 2–3 layout plans before authoring final YAML when any condition holds
 - the node budget or intended print width makes a split plausible; or
 - the user explicitly asks to compare layouts.
 
-Skip candidate comparison for a simple task whose node labels, relations, layout, and export target are already fixed. Do not turn a cosmetic edit into a redesign exercise.
+Reuse an already-fixed plan, and skip candidate comparison for cosmetic edits, regardless of node count. Record why comparison was unnecessary. Do not turn a cosmetic edit into a redesign exercise.
 
 Candidates are structured plans, not three polished figures. They must not change node labels, scientific relations, formulas, abbreviations, or evidence merely to look different.
 
@@ -67,6 +67,8 @@ python scripts/reference_index.py \
 
 `references/reference-index.json` contains only overlay-bundled examples and templates covered by the overlay MIT license. Each entry has a stable ID, path, figure type, layout features, use/avoid guidance, source, and license.
 
+Bundled-index retrieval does not replace task-specific visual research. Follow `style-research-and-brief.md` before new authoring. Keep external observation-only sources in the task-local style brief or `reference_selection.style_sources`; do not add their artwork to the MIT-covered index. Record the brief path in `contract.style_brief` (these existing object fields permit extra metadata). This is an authoring record, not a new schema requirement or a machine-validated aesthetic score; old manifests remain compatible.
+
 Use the index as a retrieval layer, not a gallery to copy blindly:
 
 - adopt abstract layout features such as layering, branch convergence, compact legends, or stage compression;
@@ -86,7 +88,7 @@ main risk: ...
 reference prior: ...
 ```
 
-Recommend one candidate using the confirmed scientific argument, intended width, node budget, loop structure, and text density. Record the selected ID and reason. If each candidate would misrepresent an unresolved relation, stop and ask for that scientific relation instead of selecting on appearance.
+Select one candidate using the settled scientific argument, intended width, node budget, loop structure, and text density; record its ID and reason. The agent may select routine geometry. Wait only if the user explicitly requested plan approval or a material scientific decision remains unresolved; ask for that relation rather than a cosmetic preference. Reuse prior selections whose scope is unchanged.
 
 Once selected, freeze the semantic inventory before geometry work:
 
@@ -98,9 +100,42 @@ Once selected, freeze the semantic inventory before geometry work:
 
 For relation-sensitive figures, also freeze directed `non_edges`, `forbidden_inferences`, and `cross_cutting_regions`. Then review a low-detail wireframe at the target aspect ratio and record `layout.wireframe_gate` as `approved`, `pending`, or `not_applicable` with a reason. A structural redesign resets this gate. See `semantic-and-layout-gates.md`.
 
+### Complete composition versus local experiment
+
+For a new complex figure or substantial redesign, render the selected
+low-detail composition before detailed styling. Include every panel and the
+actual cross-panel relations, intended output locations, representative label
+lengths and final-size font estimates. Review grouping, overview/detail
+correspondence, route corridors, whitespace and scientific meaning together;
+reviewing a component or merely listing candidate names is not this check.
+
+A user may request only a local experiment. Deliver it as such without silently
+expanding the task. Record the tested region and omitted integrations in the
+existing wireframe decision and residual risks. Use `pending` for a complete
+figure's wireframe gate when global composition is unverified; do not cite local
+approval, a context stub or a cropped print-size check as full-figure approval.
+A local prototype's own gate may be approved for its declared partial scope.
+When omitted panels are integrated later, review the full aspect ratio,
+parameter/feedback links and physical typography before detailed polish or
+whole-figure acceptance. A new integration invalidates only the decisions it
+affects, not every already-approved local detail.
+
+Separate the evidence: inspected sources support the brief; the wireframe tests
+composition; code/method checks test meaning; exported geometry tests its
+supported collisions; actual-artifact review tests readability. A manifest may
+record these reviews, but a record's existence or a strict-validation PASS does
+not prove aesthetics, author acceptance or venue compliance.
+
 A later layout-only repair may change bounds, waypoints, ports, and label offsets. It must not silently change this inventory.
 
 ## Figure-manifest contract
+
+New manifests use protocol 1.1 and final acceptance requires a hashed
+`qa.review` reference. The separate review record uses protocol 1.0. See
+[review-contract.md](review-contract.md) for source/claim mapping, caption/width
+binding, readback and issue history. Legacy manifest 1.0 can be inspected for
+diagnostics but cannot satisfy new final acceptance without explicit migration
+and the missing checks; `migrate` writes a new pending-review copy.
 
 Initialize an overlay-local manifest:
 
@@ -178,12 +213,12 @@ python scripts/figure_manifest.py build \
   --output .drawio-tmp/figure/figure.manifest.json --strict
 ```
 
-If Desktop is unavailable, record the requested PNG/PDF as `missing-evidence`, deliver the `.drawio` plus standalone SVG fallback, and do not claim a Desktop export.
+If Desktop is unavailable, apply `academic-figure-playbook.md § Academic Delivery Matrix`: raster publication may use the source-preserving browser derivative gate in `academic-export-checklist.md`; vector submission needs a permitted exporter for the accepted format; draft preview needs SVG. Record the actual renderer. Mark only artifacts that cannot be produced through a permitted path as `missing-evidence`, and deliver the available editable source and preview without claiming publication completion.
 
 ## Stopping rules
 
 - Compare at most three plans; more options usually duplicate layout families without adding evidence.
 - Select one plan before detailed YAML geometry. Do not fully render every candidate unless the user explicitly requests that cost.
-- Use the sibling visual-review limit of two autonomous repair rounds.
-- Stop when a correction needs a new scientific relation, content deletion, external data transfer, unavailable Desktop evidence, or a base-runtime change.
+- Follow the sibling visual-review progress check: reassess after two repair rounds, continue authorized reversible repairs with a concrete improvement path, and finish when required checks pass. A round count alone is not a reason to leave a fix unfinished.
+- Stop only the affected work when repeated attempts make no progress, a scientific decision remains unresolved, a content change or external transfer lacks authorization, no permitted export path can produce a required artifact, or a base-runtime change is needed. Continue independent work and report the specific missing decision or evidence.
 - If the defect belongs to the sibling base, record it as a base issue; do not vendor a private runtime patch into this overlay.

@@ -43,7 +43,7 @@ Use `scripts/visual_qa.py` for deterministic glyph, canvas-boundary, and tick-ov
 4. Make the smallest source-level correction.
 5. Re-render and re-run all affected checks.
 
-Allow at most two automatic correction rounds. Stop earlier when all required checks pass. After two rounds, or when a fix requires a new scientific choice, stop and report:
+Finish when all required checks pass. After two correction rounds, reassess the evidence and approach; continue authorized, reversible repairs while a concrete improvement path remains. Stop the blocked portion when repeated attempts make no progress, a new scientific choice is required, or further work exceeds authorization or the agreed budget. Continue independent work and report:
 
 - unresolved issue;
 - affected layer and artifact;

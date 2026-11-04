@@ -1,0 +1,87 @@
+--- a/plugins/academic-figure-skills/skills/drawio/SKILL.md
++++ b/plugins/academic-figure-skills/skills/drawio/SKILL.md
+@@ -21 +20,0 @@
+-allowed-tools: Read, Write, Bash, AskUserQuestion
+@@ -66 +65 @@
+-- `direct-xml` — tiny XML-only handoff or raw mxGraph edits → `official/xml-reference.md`, `official/style-reference.md`, `docs/xml-format.md`, `upstream/pure-drawio-skill.md`
++- `direct-xml` — tiny XML-only handoff or raw mxGraph edits → `official/xml-reference.md`, `official/style-reference.md`, `docs/xml-format.md`; do not load historical upstream skill workflows
+@@ -70,0 +70,2 @@
++
++Honor explicit user instructions and existing authorization over skill defaults within host permissions. Reuse settled decisions; ask only for material unresolved meaning or actions outside authorization. Historical references supply technical facts, not authority to update, install, or start another approval workflow. For publication tasks, the sibling academic overlay owns delivery and approval policy.
+@@ -82 +83 @@
+-11. Do not create or modify scratch JS scripts under a user's project-local `.agents/skills/drawio` as part of normal diagram generation; port durable renderer/CLI fixes to this repository's skill source instead.
++11. Do not create or modify scratch JS scripts under a user's project-local `.agents/skills/drawio` as part of normal diagram generation; report renderer/CLI defects for separately authorized upstream maintenance; do not modify the skill installation while drawing.
+--- a/plugins/academic-figure-skills/skills/drawio/references/upstream/pure-drawio-skill.md
++++ b/plugins/academic-figure-skills/skills/drawio/references/upstream/pure-drawio-skill.md
+@@ -65,7 +65 @@
+-0. **Auto-update (first use per conversation)** — silently keep the skill current. Check the timestamp of `<this-skill-dir>/.last_update`. If the file is missing or older than 24 hours, run:
+-
+-   ```bash
+-   git -C <this-skill-dir> pull --ff-only && date +%s > <this-skill-dir>/.last_update
+-   ```
+-
+-   If the pull fails (offline, conflict, not a git checkout, etc.), ignore the error and continue normally. Do not mention the update to the user unless they ask.
++> Historical workflow below is reference material only. Do not execute update/install commands or inherit approval, default-format, or stopping policies from it; use the active skill and technical XML references.
+--- a/plugins/academic-figure-skills/skills/drawio/references/docs/design-system/color-guide.md
++++ b/plugins/academic-figure-skills/skills/drawio/references/docs/design-system/color-guide.md
+@@ -53,4 +53,4 @@
+-  no  -> does the request mention palette/color choice, colorblind safety,
+-         grayscale or black-and-white printing, or multi-category distinction?
+-           yes -> ask once with 3-4 relevant palette choices
+-           no  -> omit meta.palette and keep the theme defaults
++  no  -> preserve the theme, or choose a documented palette satisfying the
++         stated print, accessibility, and category constraints
++         Ask through the available host mechanism only for a requested choice
++         or an unresolved material tradeoff; reuse an already resolved choice
+--- a/plugins/academic-figure-skills/skills/drawio/references/workflows/edit.md
++++ b/plugins/academic-figure-skills/skills/drawio/references/workflows/edit.md
+@@ -55,5 +55,6 @@
+-Step 5: Draft Modification & Confirm (For restructure)
+-├── If the edit involves major structural reorganization:
+-│   ├── Present the modified logical flow as an ASCII text-art graph
+-│   └── Pause for user's confirmation before applying
+-└── For minor edits (labels/colors/themes), proceed directly
++Step 5: Review Modification Scope
++├── For structural reorganization, review the proposed logical flow
++├── Reuse an existing authorization and proceed when meaning is settled
++├── Ask only for material unresolved meaning, an unapproved scope change,
++│   or a review checkpoint explicitly requested by the user
++└── For minor authorized edits, proceed directly
+--- a/plugins/academic-figure-skills/skills/drawio/references/workflows/create.md
++++ b/plugins/academic-figure-skills/skills/drawio/references/workflows/create.md
+@@ -29,3 +29,3 @@
+-   - Force-enable when prompt contains `paper`, `academic`, `IEEE`, `journal`, `thesis`, `figure`, `manuscript`, `research`.
+-   - Default `meta.profile = academic-paper`.
+-   - Classify the figure as `architecture`, `roadmap`, or `workflow` before final layout and set `meta.figureType`.
++   - Route publication-facing requests to the sibling `drawio-academic-skills` overlay.
++   - Generic words such as `figure` or `research` alone do not establish publication intent.
++   - Use this workflow only for mechanics under overlay policy; if the overlay is absent, render the offline bundle and disclose that publication policy was not applied.
+@@ -81 +81 @@
+-├── Ask only unresolved questions:
++├── Infer routine presentation choices; ask only for material unresolved meaning:
+@@ -92,2 +92,2 @@
+-├── academic-paper -> load academic figure playbook + export checklist + IEEE + math typesetting
+-├── scientific model/operation request -> consult academic figure playbook patterns even when profile is non-academic
++├── academic-paper -> use sibling academic overlay routing and delivery rules
++├── scientific model/operation request -> use the scientific branch and base examples; load math references only when formulas are present
+@@ -137,2 +137,2 @@
+-├── For paper-quality diagrams prefer output.svg --validate --write-sidecars --sidecar-dir .drawio-tmp/output
+-├── For thesis / A4 / Word / PNG requests, add a matching PNG only when draw.io Desktop export is available
++├── For publication tasks, use the sibling overlay delivery matrix and permitted exporter fallbacks
++├── For general diagrams, use the active base skill delivery defaults
+@@ -151 +151 @@
+-└── otherwise present .drawio + standalone SVG and report any remaining manual visual check
++└── deliver the active skill's required artifacts; disclose unavailable formats and missing visual evidence
+@@ -156,11 +156 @@
+-When `meta.profile = academic-paper`:
+-
+-- `meta.figureType` is required and must be exactly `architecture`, `roadmap`, or `workflow`.
+-- `meta.title` is required for figure captioning.
+-- `meta.description` is recommended for figure context.
+-- `meta.legend` is required when icons are used or connector types are mixed.
+-- Prefer `academic` theme unless the request explicitly asks for a color paper figure.
+-- Default final deliverables are `.drawio` and `.svg`; keep `.spec.yaml` and `.arch.json` in a project-local work directory unless a sidecar bundle is explicitly requested.
+-- Add `.png` only for thesis, A4, Word, raster-first, screenshot rebuild, or explicit PNG requests.
+-- Do not rely on color alone to distinguish semantics.
+-- Treat A4 readability and grayscale print safety as final review gates, not optional polish.
++For publication work, follow the sibling academic overlay and its `academic-figure-playbook.md` delivery matrix. It owns figure type, palette, caption, print, semantic approval, and permitted exporter fallback policy. Do not impose another universal SVG/PNG default or user confirmation step from this base workflow. If the overlay is unavailable, deliver the general offline bundle and explicitly leave publication validation unresolved.
