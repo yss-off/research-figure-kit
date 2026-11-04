@@ -11,7 +11,7 @@ import tomllib
 import zipfile
 from pathlib import Path
 
-from package_skill import FIXED_TIMESTAMP, package_files, sha256
+from package_skill import FIXED_TIMESTAMP, archive_permissions, package_files, sha256
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -54,7 +54,7 @@ def build_plugin(name: str, version: str, plugin_root: Path, output_dir: Path) -
                     f"{name}/{relative.as_posix()}", FIXED_TIMESTAMP
                 )
                 info.compress_type = zipfile.ZIP_DEFLATED
-                info.external_attr = (source.stat().st_mode & 0o777) << 16
+                info.external_attr = archive_permissions(source)
                 archive.writestr(info, source.read_bytes())
         os.replace(temporary, destination)
         destination.chmod(0o644)
