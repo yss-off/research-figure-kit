@@ -59,3 +59,17 @@ https://developers.openai.com/api/docs/guides/latest-model#prompting-best-practi
 https://learn.chatgpt.com/docs/agent-configuration/agents-md
 模型选择与 reasoning 配置由宿主控制，本文件仅规定仓库协作行为。
 -->
+
+## Agent skills
+
+### Issue tracker
+
+本仓库使用 GitHub Issues；读取、创建或更新工单前，参见 `docs/agents/issue-tracker.md`。
+
+### Triage labels
+
+使用五个默认 triage 标签；分类或修改标签前，参见 `docs/agents/triage-labels.md`。
+
+### Domain docs
+
+采用 single-context 布局；探索领域概念或设计决策前，参见 `docs/agents/domain.md`。

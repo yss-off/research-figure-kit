@@ -78,7 +78,7 @@ def review_skeleton(document: dict) -> dict:
         "readback": {"status": "not_checked", "method": "informed_self_check",
             "reviewer": "", "inputs": [], "artifact": context["visual_artifact"],
             "observations": {"input_output": "", "main_path": "", "line_meanings": "", "detail_mapping": ""},
-            "visual_assessment": "", "differences": [],
+            "visual_assessment": "", "differences": [], "answers": [],
             "viewing": {"mode": "draft_preview", "width_mm": None, "reason": ""}}}
 
 
@@ -124,6 +124,70 @@ def _schema_errors(value: Any, schema: dict, path: str = "$") -> list[str]:
     return errors
 
 
+def _check_context(context: dict, figure_id: str) -> None:
+    """Check saved structure only; historical files need not still exist."""
+    errors = _schema_errors(context, load_json(SCHEMA_PATH)["properties"]["context"])
+    if errors:
+        raise CliError("invalid review context: " + "; ".join(errors))
+    if context["figure_id"] != figure_id:
+        raise CliError("review context belongs to another figure")
+    for kind in ("nodes", "edges"):
+        rows = context["semantic_inventory"][kind]
+        if len({x["id"] for x in rows}) != len(rows):
+            raise CliError("duplicate inventory IDs in review context")
+
+
+def _check_snapshot(record: dict, figure_id: str) -> None:
+    errors = _schema_errors(record, load_json(SCHEMA_PATH))
+    if errors:
+        raise CliError("invalid review snapshot: " + "; ".join(errors))
+    if record["figure_id"] != figure_id:
+        raise CliError("review belongs to another figure")
+    _check_context(record["context"], figure_id)
+
+
+def start_review_round(document: dict, previous_path: str) -> dict:
+    """Preserve history, but require new evidence for the current context."""
+    previous = load_json(previous_path)
+    _check_snapshot(previous, document.get("figure_id"))
+    record = review_skeleton(document)
+    _check_context(record["context"], document.get("figure_id"))
+    record["scope"] = previous["scope"]
+    record["claims"] = copy.deepcopy(previous["claims"])
+    for claim in record["claims"]:
+        claim.update(status="not_checked", comparison="")
+    record["issues"] = copy.deepcopy(previous["issues"])
+    record["previous_review"] = file_ref(previous_path)
+    return record
+
+
+def revision_impact(previous: dict, document: dict) -> dict:
+    """Compare a preserved review snapshot, not mutable old source files."""
+    _check_snapshot(previous, document.get("figure_id"))
+    old = previous["context"]
+    new = current_context(document, strict=False)
+    _check_context(new, document.get("figure_id"))
+    changes = {}
+    for kind in ("nodes", "edges"):
+        before = {x["id"]: x for x in old["semantic_inventory"][kind]}
+        after = {x["id"]: x for x in new["semantic_inventory"][kind]}
+        changes[kind] = {
+            "added": sorted(after.keys() - before.keys()),
+            "removed": sorted(before.keys() - after.keys()),
+            "changed": sorted(k for k in before.keys() & after.keys() if before[k] != after[k]),
+        }
+    contract_keys = old.get("contract", {}).keys() | new.get("contract", {}).keys()
+    changed_context = sorted(k for k in old.keys() | new.keys() if old.get(k) != new.get(k))
+    return {
+        "changed_context": changed_context,
+        "contract_fields": sorted(k for k in contract_keys if old.get("contract", {}).get(k) != new.get("contract", {}).get(k)),
+        "inventory": changes,
+        "prior_issues": [{"id": i["id"], "objects": i["object_ids"], "state": i["events"][-1]["state"]} for i in previous["issues"]],
+        "requires_new_round": bool(changed_context),
+        "notice": "Inventory differences do not detect undeclared omissions or layout changes. Changed spec/export hashes require actual-artifact rechecking; this report never closes issues or carries PASS forward.",
+    }
+
+
 def validate_review(record: Any, document: dict, *, finalizing: bool) -> list[dict]:
     findings = []
 
@@ -139,6 +203,11 @@ def validate_review(record: Any, document: dict, *, finalizing: bool) -> list[di
     if record["figure_id"] != document.get("figure_id"):
         problem("review_figure", "review belongs to another figure")
     try:
+        _check_snapshot(record, document.get("figure_id"))
+    except CliError as exc:
+        problem("review_context_invalid", str(exc))
+        return findings
+    try:
         current = current_context(document, strict=finalizing)
     except (CliError, KeyError, TypeError, ValueError) as exc:
         problem("review_inputs", str(exc))
@@ -151,8 +220,9 @@ def validate_review(record: Any, document: dict, *, finalizing: bool) -> list[di
     if previous_ref:
         try:
             previous = load_json(previous_ref["path"])
-            if previous_ref["sha256"] != sha256_file(previous_ref["path"]) or previous.get("figure_id") != record["figure_id"] or _schema_errors(previous, load_json(SCHEMA_PATH)):
+            if previous_ref["sha256"] != sha256_file(previous_ref["path"]):
                 raise CliError("previous review is changed or invalid")
+            _check_snapshot(previous, record["figure_id"])
             issues_now = {x["id"]: x for x in record["issues"]}
             for issue in previous["issues"]:
                 retained = issues_now.get(issue["id"])
@@ -193,6 +263,33 @@ def validate_review(record: Any, document: dict, *, finalizing: bool) -> list[di
     if covered != expected_ids:
         problem("review_claim_coverage", "claims must cover declared node/edge IDs exactly; grouping is allowed")
     readback = record["readback"]
+    # Optional task-specific questions live in the context-bound contract.
+    # Their answers are observations, never automatically inferred from claims.
+    questions = contract.get("reader_questions", [])
+    question_ids = set()
+    if not isinstance(questions, list):
+        problem("review_questions", "contract.reader_questions must be a list")
+        questions = []
+    for question in questions:
+        if (not isinstance(question, dict) or set(question) != {"id", "question", "object_ids"}
+                or not isinstance(question.get("id"), str) or not question["id"].strip()
+                or not isinstance(question.get("question"), str) or not question["question"].strip()
+                or not isinstance(question.get("object_ids"), list)
+                or not question["object_ids"] or any(not isinstance(x, str) or x not in expected_ids for x in question["object_ids"])):
+            problem("review_questions", "each reader question needs a stable ID, question and existing object IDs")
+            continue
+        if question["id"] in question_ids:
+            problem("review_questions", "duplicate reader question ID")
+        question_ids.add(question["id"])
+    answer_ids = set()
+    for answer in readback.get("answers", []):
+        if answer["id"] in answer_ids:
+            problem("review_answers", "duplicate reader answer ID")
+        answer_ids.add(answer["id"])
+        if answer["status"] != "pass" or not answer["observation"].strip():
+            problem("review_answers", "each reader question needs a current concrete observation")
+    if answer_ids != question_ids:
+        problem("review_answers", "readback answers must cover declared reader questions exactly")
     if readback["status"] != "pass" or not readback["reviewer"].strip() or not readback["visual_assessment"].strip() or any(not s.strip() for s in readback["observations"].values()):
         problem("review_readback", "record actual reading and visual assessment, including inapplicable inset explanations")
     if not {"artifact", "caption", "audience"}.issubset(readback["inputs"]):
@@ -293,17 +390,8 @@ def main(argv=None):
             findings = verify_review(document, finalizing=args.strict or document.get("status") == "accepted")
             emit_json({"findings": findings, "notice": "Checks evidence contracts, not semantic truth."})
             return 2 if any(f["severity"] == "error" for f in findings) else 0
-        record = review_skeleton(document)
-        if args.command == "start-round":
-            previous = load_json(args.previous_review)
-            if _schema_errors(previous, load_json(SCHEMA_PATH)) or previous["figure_id"] != record["figure_id"]:
-                raise CliError("invalid previous review or different figure")
-            record["scope"] = previous["scope"]
-            record["claims"] = copy.deepcopy(previous["claims"])
-            for claim in record["claims"]:
-                claim.update(status="not_checked", comparison="")
-            record["issues"] = copy.deepcopy(previous["issues"])
-            record["previous_review"] = file_ref(args.previous_review)
+        record = (start_review_round(document, args.previous_review)
+                  if args.command == "start-round" else review_skeleton(document))
         output = Path(args.output).absolute()
         protected = {Path(args.manifest).absolute()}
         for item in record["context"]["artifacts"] + record["context"]["sources"]:

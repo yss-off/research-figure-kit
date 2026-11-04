@@ -562,6 +562,24 @@ def validate_manifest(
         record = qa.get(layer)
         if not isinstance(record, dict) or record.get("status") not in QA_STATUSES:
             _finding(findings, "qa_status", f"qa.{layer}.status", "has an unsupported status")
+    # Evidence rules belong here; delivery only presents these findings.
+    publication = qa.get("publication")
+    checks = publication.get("checks") if isinstance(publication, dict) else None
+    severity = "error" if finalizing else "warning"
+    if not isinstance(checks, list) or not checks:
+        _finding(findings, "publication_checks_missing", "qa.publication.checks",
+                 "record a nonempty list of publication check observations", severity=severity)
+    else:
+        for index, check in enumerate(checks):
+            valid = isinstance(check, str) and bool(check.strip())
+            if isinstance(check, dict):
+                valid = (check.get("status") == "pass"
+                    and all(isinstance(check.get(key), str) and check[key].strip()
+                            for key in ("name", "evidence")))
+            if not valid:
+                _finding(findings, "publication_check_incomplete", f"qa.publication.checks[{index}]",
+                         "Use a nonempty check observation, or name/status=pass/evidence; empty and unresolved entries are not completed checks.",
+                         severity=severity)
     if not isinstance(qa.get("residual_risks"), list):
         _finding(findings, "residual_risks", "qa.residual_risks", "must be a list")
     provenance = _require_object(document, "provenance", findings)
@@ -618,13 +636,14 @@ def validate_manifest(
                 "draft-preview requires an SVG preview artifact",
             )
         for layer in ("deterministic", "visual", "publication"):
-            layer_status = (qa.get(layer) or {}).get("status")
-            if layer_status in {"pending", "not_checked", "blocked", None}:
+            record = qa.get(layer)
+            layer_status = record.get("status") if isinstance(record, dict) else None
+            if layer_status != "pass":
                 _finding(
                     findings,
                     "qa_incomplete",
                     f"qa.{layer}.status",
-                    f"cannot be {layer_status!r} for accepted/strict validation",
+                    f"must be pass for accepted/strict validation, got {layer_status!r}",
                 )
         for key, value in contract.items():
             if value == "pending":

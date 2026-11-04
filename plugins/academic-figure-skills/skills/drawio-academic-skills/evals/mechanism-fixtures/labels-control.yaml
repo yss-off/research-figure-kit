@@ -1,0 +1,92 @@
+{
+  "meta": {
+    "profile": "academic-paper",
+    "figureType": "architecture",
+    "theme": "academic",
+    "layout": "horizontal",
+    "title": "Mechanism review fixture",
+    "description": "Anonymous paired diagnostic fixture for mechanism reading."
+  },
+  "nodes": [
+    {
+      "id": "features",
+      "label": "Features",
+      "type": "service",
+      "bounds": {
+        "x": 40,
+        "y": 40,
+        "width": 140,
+        "height": 50
+      },
+      "style": {
+        "fontSize": 14
+      }
+    },
+    {
+      "id": "queries",
+      "label": "Queries",
+      "type": "service",
+      "bounds": {
+        "x": 280,
+        "y": 40,
+        "width": 140,
+        "height": 50
+      },
+      "style": {
+        "fontSize": 14
+      }
+    },
+    {
+      "id": "attention",
+      "label": "Attention",
+      "type": "service",
+      "bounds": {
+        "x": 40,
+        "y": 260,
+        "width": 380,
+        "height": 50
+      },
+      "style": {
+        "fontSize": 14
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "kv",
+      "from": "features",
+      "to": "attention",
+      "type": "primary",
+      "style": {
+        "exitX": 0.5,
+        "exitY": 1,
+        "entryX": 0.18421052631578946,
+        "entryY": 0,
+        "fontSize": 14
+      },
+      "label": "K, V",
+      "labelOffset": {
+        "x": -35,
+        "y": 0
+      }
+    },
+    {
+      "id": "q",
+      "from": "queries",
+      "to": "attention",
+      "type": "primary",
+      "style": {
+        "exitX": 0.5,
+        "exitY": 1,
+        "entryX": 0.8157894736842105,
+        "entryY": 0,
+        "fontSize": 14
+      },
+      "label": "Q",
+      "labelOffset": {
+        "x": 35,
+        "y": 0
+      }
+    }
+  ]
+}

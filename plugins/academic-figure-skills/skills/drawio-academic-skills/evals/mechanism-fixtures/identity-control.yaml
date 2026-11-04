@@ -1,0 +1,54 @@
+{
+  "meta": {
+    "profile": "academic-paper",
+    "figureType": "architecture",
+    "theme": "academic",
+    "layout": "horizontal",
+    "title": "Mechanism review fixture",
+    "description": "Anonymous paired diagnostic fixture for mechanism reading."
+  },
+  "nodes": [
+    {
+      "id": "queries",
+      "label": "Learnable queries\nq_A: A\nq_B: B",
+      "type": "service",
+      "bounds": {
+        "x": 40,
+        "y": 100,
+        "width": 170,
+        "height": 80
+      },
+      "style": {
+        "fontSize": 14
+      }
+    },
+    {
+      "id": "decoder",
+      "label": "Decoder",
+      "type": "service",
+      "bounds": {
+        "x": 320,
+        "y": 115,
+        "width": 140,
+        "height": 50
+      },
+      "style": {
+        "fontSize": 14
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "query_input",
+      "from": "queries",
+      "to": "decoder",
+      "type": "primary",
+      "style": {
+        "exitX": 1,
+        "exitY": 0.5,
+        "entryX": 0,
+        "entryY": 0.5
+      }
+    }
+  ]
+}
