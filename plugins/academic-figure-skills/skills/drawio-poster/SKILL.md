@@ -17,6 +17,10 @@ Use this overlay for customer-facing process posters. It owns hierarchy, concise
 - User-provided claims are copy inputs, not verified official facts. Do not invent official endorsement, availability dates, service duration or future prices. Preserve supplied caveats; research claims only when requested or needed to answer a factual question. If references contain conflicting copy, the user's current instructions win.
 - Preserve a chosen flowchart when polishing it. Cards suit comparison; branches suit conditional choice. Do not replace one with the other solely to make the page look cleaner.
 
+## Research the task's style before composing
+
+Before a new poster or substantial restyling, inspect relevant actual poster/brand examples for the current purpose, audience, and viewing size; record source/version, observed features to adopt or reject, and a concrete style brief for hierarchy, layout, typography, palette, spacing, and connector treatment in the task's `.drawio-tmp/` directory. Use permitted browsing or inspected local references; a brand name, palette, or unrelated paper template is insufficient. If evidence is unavailable, label assumptions provisional. Recheck and reuse a matching brief for small edits. Present the style proposal first when the user requested discussion; otherwise choose reversible appearance details within scope. Borrow abstract features without copying protected artwork or suggesting endorsement. This research phase does not add a network dependency to drawing/export.
+
 ## Compose before polishing
 
 Determine the intended viewing width or print size from context. In ordinary chat sharing, a 390–432 px preview is a useful **test assumption**, not a universal canvas size. Confirm where the eye should go: title → applicable condition → outcome/action; notes explain or qualify and should not compete with the flow.

@@ -104,10 +104,14 @@ codex plugin list --json --available
 make test                # 三个 skill 的聚焦回归
 make test-routing        # 跨 skill 路由契约
 make check               # 插件、版本、JSON、CLI 和回归校验
-make check-plugin        # Codex 插件 manifest 校验
+make check-plugin        # 可移植的仓库 manifest 与 skill 结构校验
 make check-base          # bundled drawio 与 academic overlay 兼容性
 make package             # 生成确定性插件 ZIP
 ```
+
+如需额外运行已安装的外部 Python 插件校验器，使用
+`make check-plugin PLUGIN_VALIDATOR=/absolute/path/to/validate_plugin.py`。
+显式指定的校验器缺失或执行失败时，检查会失败；默认仓库校验不代表宿主执行或公开提交审核通过。
 
 提交 pull request 前，请阅读 [CONTRIBUTING.md](CONTRIBUTING.md)。安全问题请按 [SECURITY.md](SECURITY.md) 私下报告，不要在公开 issue 中披露。
 

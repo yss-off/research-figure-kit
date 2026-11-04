@@ -45,6 +45,14 @@ Example:
 
 The manifest validator detects unknown endpoints, duplicate boundary IDs, a declared non-edge that also exists as an edge, unknown cross-cutting members, and an unresolved wireframe gate. It cannot detect every visual implication; the exported-artifact review still owns that judgment.
 
+## Arrow landing space
+
+For routed orthogonal arrows, reserve a terminal segment long enough for the
+exported head plus visible clearance. Audit the exported geometry using
+[connector reliability](connector-reliability.md); the existing crossing count
+and manifest validator do not check marker footprints. Keep their evidence
+separate from the final arrow-attachment and print-scale visual review.
+
 ## Wireframe Gate
 
 Before typography, color, icons, or connector-label polishing, review a low-detail wireframe at the target aspect ratio. A text or monochrome shape wireframe is sufficient when it exposes:

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import re
 import sys
 from pathlib import Path
@@ -18,7 +19,7 @@ from _common import (
     sha256_file,
 )
 
-SCHEMA_VERSION = "1.0"
+SCHEMA_VERSION = "1.1"
 FIGURE_TYPES = {"architecture", "workflow", "roadmap"}
 DELIVERY_CLASSES = {"raster-publication", "vector-submission", "draft-preview"}
 MANIFEST_STATUSES = {"planning", "rendered", "review", "accepted"}
@@ -405,8 +406,6 @@ def _validate_render(
         role = artifact.get("role")
         if role not in ARTIFACT_ROLES:
             _finding(findings, "artifact_role", f"{path}.role", f"unsupported role {role!r}")
-        else:
-            roles.add(role)
         evidence = artifact.get("evidence_label")
         if evidence not in EVIDENCE_LABELS:
             _finding(
@@ -419,6 +418,10 @@ def _validate_render(
         if not isinstance(artifact_path, str) or not artifact_path:
             _finding(findings, "artifact_path", f"{path}.path", "must be non-empty")
             continue
+        # A placeholder may be recorded during planning, but cannot satisfy a
+        # delivery requirement, even when file verification was not requested.
+        if role in ARTIFACT_ROLES and evidence in EVIDENCE_LABELS and evidence != "missing-evidence":
+            roles.add(role)
         if verify_artifacts and evidence != "missing-evidence":
             try:
                 source = checked_input_file(artifact_path)
@@ -458,8 +461,8 @@ def validate_manifest(
     unknown = set(document).difference(allowed_top)
     if unknown:
         _finding(findings, "unknown_top_level", "$", f"unknown fields: {sorted(unknown)}")
-    if document.get("schema_version") != SCHEMA_VERSION:
-        _finding(findings, "schema_version", "schema_version", "must equal 1.0")
+    if document.get("schema_version") not in {"1.0", SCHEMA_VERSION}:
+        _finding(findings, "schema_version", "schema_version", "must equal 1.0 or 1.1")
     figure_id = document.get("figure_id")
     if not isinstance(figure_id, str) or not SAFE_ID.fullmatch(figure_id):
         _finding(findings, "figure_id", "figure_id", "must be a stable safe ID")
@@ -469,6 +472,10 @@ def validate_manifest(
     if status not in MANIFEST_STATUSES:
         _finding(findings, "manifest_status", "status", f"unsupported status {status!r}")
     finalizing = status == "accepted" or strict
+    if document.get("schema_version") == "1.0":
+        _finding(findings, "review_migration_required", "schema_version",
+                 "legacy manifest: migrate to 1.1 and complete review before acceptance",
+                 severity="error" if finalizing else "warning")
 
     contract = _require_object(document, "contract", findings)
     if contract.get("figure_type") not in FIGURE_TYPES:
@@ -546,7 +553,10 @@ def validate_manifest(
             else:
                 seen_references.add(reference_id)
     render = _require_object(document, "render", findings)
-    roles = _validate_render(render, findings, verify_artifacts=verify_artifacts)
+    roles = _validate_render(render, findings, verify_artifacts=verify_artifacts or finalizing)
+    artifacts = render.get("artifacts") if isinstance(render.get("artifacts"), list) else []
+    # Invalid entries already have findings; do not dereference them below.
+    artifacts = [item for item in artifacts if isinstance(item, dict)]
     qa = _require_object(document, "qa", findings)
     for layer in ("deterministic", "visual", "publication"):
         record = qa.get(layer)
@@ -578,7 +588,6 @@ def validate_manifest(
                 "render.artifacts",
                 "must include drawio and at least one inspectable SVG/PNG/PDF",
             )
-        artifacts = render.get("artifacts") if isinstance(render.get("artifacts"), list) else []
         if delivery_class == "raster-publication" and "png" not in roles:
             _finding(
                 findings,
@@ -591,6 +600,7 @@ def validate_manifest(
                 isinstance(item, dict)
                 and item.get("role") == "svg"
                 and item.get("text_mode") == "paths"
+                and item.get("evidence_label") in EVIDENCE_LABELS - {"missing-evidence"}
                 for item in artifacts
             )
             if "pdf" not in roles and not has_path_svg:
@@ -625,6 +635,56 @@ def validate_manifest(
                     "must be resolved or explicitly marked not_applicable",
                 )
 
+    if finalizing:
+        for item in artifacts:
+            if item.get("evidence_label") != "missing-evidence" and not item.get("sha256"):
+                _finding(findings, "artifact_hash_missing", "render.artifacts", "accepted/strict delivery requires hashes for current delivered files")
+
+    # Geometry evidence is replayed for accepted/strict delivery, not inferred
+    # from a helper's PASS label. Ordinary diagnostic previews remain possible.
+    from audit_figure_geometry import verify_evidence
+    geometry = qa.get("geometry")
+    if not isinstance(geometry, dict) or not geometry:
+        if finalizing:
+            _finding(findings, "geometry_evidence_missing", "qa.geometry", "accepted/strict delivery requires a current replayable geometry audit")
+    else:
+        svg_path = geometry.get("svg") or next((x.get("path") for x in artifacts if x.get("role") == "svg"), None)
+        declared_svg = next((x.get("path") for x in artifacts if x.get("role") == "svg"), None)
+        messages = []
+        if not svg_path:
+            messages.append("geometry SVG input is missing")
+        else:
+            if declared_svg and Path(svg_path).resolve() != Path(declared_svg).resolve():
+                messages.append("geometry input differs from the delivered SVG")
+            messages.extend(verify_evidence(svg_path, geometry))
+        severity = "error" if finalizing else "warning"
+        for message in messages:
+            _finding(findings, "geometry_evidence_invalid", "qa.geometry", message, severity=severity)
+        if finalizing and svg_path and not messages:
+            try:
+                scene = load_json(geometry["scene"])
+                if {x["id"] for x in scene["nodes"]} != {x["id"] for x in inventory["nodes"]} or {x["id"] for x in scene["edges"]} != {x["id"] for x in inventory["edges"]}:
+                    _finding(findings, "geometry_inventory_mismatch", "qa.geometry", "scene IDs must cover the declared inventory exactly")
+                visual = qa.get("visual") or {}
+                if visual.get("status") != "pass" or visual.get("issues"):
+                    _finding(findings, "visual_review_incomplete", "qa.visual", "accepted/strict delivery requires closed visual findings and pass status")
+                if not visual.get("artifact") or visual.get("sha256") != sha256_file(visual["artifact"]):
+                    _finding(findings, "visual_review_stale", "qa.visual", "visual review must hash the actual inspected current artifact")
+                scientific = qa.get("scientific") or {}
+                if scientific.get("status") != "pass" or not scientific.get("basis") or scientific.get("svg_sha256") != sha256_file(svg_path):
+                    _finding(findings, "scientific_review_incomplete", "qa.scientific", "record the current scientific/semantic review basis separately from geometry")
+                sources = scientific.get("sources")
+                if not isinstance(sources, list) or not sources:
+                    _finding(findings, "scientific_sources_missing", "qa.scientific.sources", "record source evidence, or an explicit non-empirical contract file")
+                else:
+                    for source in sources:
+                        if source.get("sha256") != sha256_file(source["path"]):
+                            _finding(findings, "scientific_source_stale", "qa.scientific.sources", "a reviewed source changed")
+            except (OSError, ValueError, KeyError, CliError) as error:
+                _finding(findings, "review_evidence_unavailable", "qa", str(error))
+
+    from figure_review import verify_review
+    findings.extend(verify_review(document, finalizing=finalizing))
     errors = sum(item["severity"] == "error" for item in findings)
     warnings = sum(item["severity"] == "warning" for item in findings)
     return {
@@ -677,6 +737,9 @@ def build_parser() -> argparse.ArgumentParser:
     build.add_argument("--output", required=True)
     build.add_argument("--strict", action="store_true")
     build.add_argument("--force", action="store_true")
+    migrate = subparsers.add_parser("migrate", help="copy a legacy manifest to pending review under 1.1")
+    migrate.add_argument("input")
+    migrate.add_argument("--output", required=True)
     return parser
 
 
@@ -690,6 +753,20 @@ def main(argv: list[str] | None = None) -> int:
             emit_json({"status": "written", "path": str(Path(args.output).resolve())})
             return 0
         document = load_json(args.input)
+        if args.command == "migrate":
+            if document.get("schema_version") != "1.0":
+                raise CliError("migration requires a legacy 1.0 manifest")
+            if Path(args.input).resolve() == Path(args.output).resolve():
+                raise CliError("migration output must differ from its input")
+            document = copy.deepcopy(document)
+            document.update(schema_version=SCHEMA_VERSION, status="review")
+            qa = document.setdefault("qa", {})
+            qa.setdefault("visual", {}).update(status="not_checked")
+            qa.setdefault("scientific", {}).update(status="not_checked")
+            qa.pop("review", None)
+            atomic_write_json(args.output, document)
+            emit_json({"path": str(Path(args.output).resolve()), "notice": "Migrated to review; old issues retained. Initialize a review record and perform checks."})
+            return 0
         if args.command == "validate":
             report = validate_manifest(
                 document,

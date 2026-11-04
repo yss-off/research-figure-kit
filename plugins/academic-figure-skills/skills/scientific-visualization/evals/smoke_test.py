@@ -113,6 +113,26 @@ class MatplotlibTests(unittest.TestCase):
         self.assertTrue(report["font_stack"])
         self.assertTrue(all(Path(item["path"]).is_file() for item in report["font_stack"]))
 
+    def test_preview_preserves_dimensions_under_global_tight_bbox(self) -> None:
+        import struct
+        import matplotlib as mpl
+        import matplotlib.pyplot as plt
+        from visual_qa import render_preview
+
+        fig, axis = plt.subplots(figsize=(4, 3))
+        axis.plot([0, 1], [0, 1])
+        try:
+            with tempfile.TemporaryDirectory() as directory, mpl.rc_context({"savefig.bbox": "tight"}):
+                for dpi in (100, 150):
+                    output = render_preview(fig, Path(directory) / f"preview-{dpi}.png", dpi=dpi)
+                    # PNG IHDR records the actual exported width and height.
+                    width, height = struct.unpack(">II", output.read_bytes()[16:24])
+                    self.assertEqual((4 * dpi, 3 * dpi), (width, height))
+                    self.assertEqual("tight", mpl.rcParams["savefig.bbox"])
+                self.assertEqual([4, 3], list(fig.get_size_inches()))
+        finally:
+            plt.close(fig)
+
     def test_export_workflow_extension_and_no_overwrite(self) -> None:
         import matplotlib.pyplot as plt
 

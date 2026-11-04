@@ -100,11 +100,16 @@ make test
 make test-routing
 make check
 make check-base
-make check-plugin   # requires the Codex plugin-creator system skill
+make check-plugin   # portable repository manifest and skill-structure checks
 make package
 ```
 
 GitHub Actions runs the portable test, routing, project, base-compatibility, and deterministic-package checks. The generated plugin ZIP is attached to each successful CI run as an artifact.
+
+To additionally run an installed external Python plugin validator, use
+`make check-plugin PLUGIN_VALIDATOR=/absolute/path/to/validate_plugin.py`.
+An explicitly supplied missing or failing validator fails the check; the default
+repository checks do not certify host execution or public submission approval.
 
 ## Repository map
 

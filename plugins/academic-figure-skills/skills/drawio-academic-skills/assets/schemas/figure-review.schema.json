@@ -1,0 +1,402 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.invalid/drawio-academic/figure-review-1.0.schema.json",
+  "title": "Evidence associations and review history, not semantic certification",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "figure_id",
+    "scope",
+    "context",
+    "claims",
+    "readback",
+    "issues"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "figure_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope": {
+      "enum": [
+        "pending",
+        "implementation",
+        "conceptual"
+      ]
+    },
+    "context": {
+      "type": "object"
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "object_ids",
+          "statement",
+          "sources",
+          "simplification",
+          "status",
+          "comparison"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "object_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "statement": {
+            "type": "string",
+            "minLength": 0
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "path",
+                "locator"
+              ],
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "locator": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "simplification": {
+            "type": "string",
+            "minLength": 0
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "not_checked",
+              "pass",
+              "review",
+              "blocked"
+            ]
+          },
+          "comparison": {
+            "type": "string",
+            "minLength": 0
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "readback": {
+      "type": "object",
+      "required": [
+        "status",
+        "method",
+        "reviewer",
+        "inputs",
+        "artifact",
+        "observations",
+        "visual_assessment",
+        "differences",
+        "viewing"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "pending",
+            "not_checked",
+            "pass",
+            "review",
+            "blocked"
+          ]
+        },
+        "method": {
+          "enum": [
+            "informed_self_check",
+            "isolated_context",
+            "independent_reviewer"
+          ]
+        },
+        "reviewer": {
+          "type": "string",
+          "minLength": 0
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "artifact",
+              "caption",
+              "audience",
+              "design_context",
+              "claims",
+              "code"
+            ]
+          }
+        },
+        "artifact": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sha256": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          "additionalProperties": false
+        },
+        "observations": {
+          "type": "object",
+          "required": [
+            "input_output",
+            "main_path",
+            "line_meanings",
+            "detail_mapping"
+          ],
+          "properties": {
+            "input_output": {
+              "type": "string",
+              "minLength": 0
+            },
+            "main_path": {
+              "type": "string",
+              "minLength": 0
+            },
+            "line_meanings": {
+              "type": "string",
+              "minLength": 0
+            },
+            "detail_mapping": {
+              "type": "string",
+              "minLength": 0
+            }
+          },
+          "additionalProperties": false
+        },
+        "visual_assessment": {
+          "type": "string",
+          "minLength": 0
+        },
+        "differences": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "observation",
+              "decision",
+              "reason",
+              "issue_id"
+            ],
+            "properties": {
+              "observation": {
+                "type": "string",
+                "minLength": 1
+              },
+              "decision": {
+                "enum": [
+                  "pending",
+                  "defect",
+                  "allowed_abstraction",
+                  "reviewer_error"
+                ]
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 0
+              },
+              "issue_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "viewing": {
+          "type": "object",
+          "required": [
+            "mode",
+            "width_mm",
+            "reason"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                "intended_size",
+                "draft_preview"
+              ]
+            },
+            "width_mm": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "exclusiveMinimum": 0
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 0
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "object_ids",
+          "category",
+          "problem",
+          "evidence",
+          "events"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "object_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "category": {
+            "enum": [
+              "geometry",
+              "scientific",
+              "visual"
+            ]
+          },
+          "problem": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 1
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "state",
+                "decision",
+                "verification",
+                "context_sha256",
+                "artifacts"
+              ],
+              "properties": {
+                "state": {
+                  "enum": [
+                    "open",
+                    "fixed",
+                    "closed",
+                    "not_defect"
+                  ]
+                },
+                "decision": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "verification": {
+                  "type": "string",
+                  "minLength": 0
+                },
+                "context_sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "artifacts": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "path",
+                      "sha256"
+                    ],
+                    "properties": {
+                      "path": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "sha256": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "pattern": "^[a-f0-9]{64}$"
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "additionalProperties": false
+            },
+            "minItems": 1
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "previous_review": {
+      "type": "object",
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
