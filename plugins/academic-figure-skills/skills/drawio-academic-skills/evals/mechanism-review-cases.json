@@ -1,0 +1,87 @@
+{
+  "schema_version": "1.0",
+  "notice": "Paired author-known fixtures. Not an independent benchmark. Export YAML through sibling base, inspect at declared width, and record observed issues separately from expected issues. For independent tests provide only task/artifact/caption/audience, not this answer key.",
+  "review_width_mm": 100,
+  "cases": [
+    {
+      "id": "port-offset",
+      "capability": "single-port",
+      "task": "The source has one bottom output; no obstacle, grouping or frozen-layout constraint requires an offset. Review the connector and overall spacing.",
+      "spec": "mechanism-fixtures/port-offset.yaml",
+      "expected_issue_ids": [
+        "unjustified_port_offset"
+      ]
+    },
+    {
+      "id": "port-control",
+      "capability": "single-port",
+      "task": "The source has one bottom output; review the connector and overall spacing.",
+      "spec": "mechanism-fixtures/port-control.yaml",
+      "expected_issue_ids": []
+    },
+    {
+      "id": "labels-ambiguous",
+      "capability": "label-owner",
+      "task": "Features supply K,V; queries supply Q. Review whether the exported diagram makes each label ownership clear.",
+      "spec": "mechanism-fixtures/labels-ambiguous.yaml",
+      "expected_issue_ids": [
+        "ambiguous_label_ownership"
+      ]
+    },
+    {
+      "id": "labels-control",
+      "capability": "label-owner",
+      "task": "Features supply K,V; queries supply Q. Review whether the exported diagram makes each label ownership clear.",
+      "spec": "mechanism-fixtures/labels-control.yaml",
+      "expected_issue_ids": []
+    },
+    {
+      "id": "identity-missing",
+      "capability": "identity",
+      "task": "Every learnable query has a fixed class assignment. The figure must communicate this distinction without suggesting frozen parameters.",
+      "spec": "mechanism-fixtures/identity-missing.yaml",
+      "expected_issue_ids": [
+        "missing_class_assignment"
+      ]
+    },
+    {
+      "id": "identity-control",
+      "capability": "identity",
+      "task": "Every learnable query has a fixed class assignment. The figure must communicate this distinction without suggesting frozen parameters.",
+      "spec": "mechanism-fixtures/identity-control.yaml",
+      "expected_issue_ids": []
+    }
+  ],
+  "additional_cases": [
+    {
+      "id": "required-residual",
+      "task": "A skip connection bypasses an attention block to Add & Norm; the direct line would cross the block.",
+      "expected": "Retain the residual route; do not minimize bends or change the tap."
+    },
+    {
+      "id": "shorter-but-crowded",
+      "task": "A direct route would crowd two inputs and detach their labels; the author has selected the balanced bent version.",
+      "expected": "Retain the balanced version and explain the tradeoff."
+    },
+    {
+      "id": "wrong-inset-level",
+      "task": "An inset shows one layer, but its callout points to the whole decoder container.",
+      "expected": "Identify the actual layer; do not treat the inset as a third stage."
+    },
+    {
+      "id": "invented-operation",
+      "task": "Code computes loss on aligned predicted and target patches directly; the figure inserts an executed image reconstruction step.",
+      "expected": "Flag the extra operation, distinguishing mathematical equivalence from execution."
+    },
+    {
+      "id": "example-role",
+      "task": "Different-source appearance thumbnails sit immediately after a prediction arrow with no indication they are independent examples.",
+      "expected": "Flag implied same-input predictions; check attribution separately from scientific role."
+    },
+    {
+      "id": "caption-staleness",
+      "task": "The caption changes after review while the image bytes stay the same.",
+      "expected": "Prior review is stale; use a new round rather than copying PASS."
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "name": "academic-figure-skills",
-  "version": "0.3.3",
-  "description": "Create editable, verifiable, and reproducible research figures with three coordinated offline-first skills.",
+  "version": "0.3.4",
+  "description": "Create editable research figures and branded flow posters with coordinated offline-first skills.",
   "author": {
     "name": "yss-off and contributors",
     "url": "https://github.com/yss-off/research-figure-kit"
@@ -23,7 +23,7 @@
   "interface": {
     "displayName": "Research Figure Kit",
     "shortDescription": "Editable, verifiable, reproducible research figures.",
-    "longDescription": "Bundle structured Draw.io authoring, publication-aware diagram review, and evidence-aware scientific visualization in one self-contained Codex plugin.",
+    "longDescription": "Bundle structured Draw.io authoring, publication-aware review, scientific visualization, and mobile-aware branded flow posters in one self-contained Codex plugin.",
     "developerName": "yss-off and contributors",
     "category": "Productivity",
     "capabilities": [

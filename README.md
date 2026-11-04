@@ -5,7 +5,7 @@
 **Research figures you can edit, check, and reproduce.**
 
 [![CI](https://github.com/yss-off/research-figure-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/yss-off/research-figure-kit/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.3.3-2563EB)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.3.4-2563EB)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-0B7285)](LICENSE)
 [![Codex Plugin](https://img.shields.io/badge/Codex-plugin-111827)](plugins/academic-figure-skills/.codex-plugin/plugin.json)
 
@@ -25,6 +25,7 @@ Research Figure Kit is an open-source Codex plugin that treats a figure as an ev
 |---|---|---|---|
 | `drawio` | General diagrams, architecture, network topology, UML, flowcharts, and `.drawio` editing | YAML | Editable `.drawio`, SVG/PNG, validation diagnostics |
 | `drawio-academic-skills` | Paper, thesis, manuscript, and Word-facing architecture, mechanism, workflow, and roadmap figures | YAML + figure manifest | Layout alternatives, semantic gates, editable source, publication artifact |
+| `drawio-poster` | Branded service-flow posters, customer decision guides, mobile review and concise notes | YAML + revision evidence | Editable poster, viewing-size audit, measured text wrapping |
 | `scientific-visualization` | Numeric data, uncertainty, repeated units, missingness, statistical encoding, Matplotlib/Seaborn/Plotly | Data + plotting code + figure contract | Read-only profile, chart rationale, plot, export and QA evidence |
 
 ## Why it is different
@@ -99,11 +100,16 @@ make test
 make test-routing
 make check
 make check-base
-make check-plugin   # requires the Codex plugin-creator system skill
+make check-plugin   # portable repository manifest and skill-structure checks
 make package
 ```
 
 GitHub Actions runs the portable test, routing, project, base-compatibility, and deterministic-package checks. The generated plugin ZIP is attached to each successful CI run as an artifact.
+
+To additionally run an installed external Python plugin validator, use
+`make check-plugin PLUGIN_VALIDATOR=/absolute/path/to/validate_plugin.py`.
+An explicitly supplied missing or failing validator fails the check; the default
+repository checks do not certify host execution or public submission approval.
 
 ## Repository map
 
@@ -116,6 +122,7 @@ GitHub Actions runs the portable test, routing, project, base-compatibility, and
 │   └── skills/
 │       ├── drawio/
 │       ├── drawio-academic-skills/
+│       ├── drawio-poster/
 │       └── scientific-visualization/
 ├── evals/                 # cross-skill routing cases
 ├── management/            # provenance and engineering decisions

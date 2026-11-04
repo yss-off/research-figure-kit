@@ -1,6 +1,6 @@
 [project]
 name = "academic-figure-skills"
-version = "0.3.3"
+version = "0.3.4"
 description = "Self-contained Codex plugin for publication diagrams and scientific data figures"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -15,7 +15,7 @@ testpaths = ["tests"]
 [tool.academic_figure_skills.plugin]
 name = "academic-figure-skills"
 path = "plugins/academic-figure-skills"
-version = "0.3.3"
+version = "0.3.4"
 marketplace_path = ".agents/plugins/marketplace.json"
 
 [[tool.academic_figure_skills.skills]]
@@ -29,7 +29,7 @@ source_commit = "27dac02ce3b4901c844aaa623ad64c3d577c3a72"
 [[tool.academic_figure_skills.skills]]
 name = "drawio-academic-skills"
 path = "plugins/academic-figure-skills/skills/drawio-academic-skills"
-version = "0.1.2"
+version = "0.1.3"
 kind = "drawio-overlay"
 base_skill_name = "drawio"
 
@@ -38,3 +38,10 @@ name = "scientific-visualization"
 path = "plugins/academic-figure-skills/skills/scientific-visualization"
 version = "1.2.1"
 kind = "scientific-plotting"
+
+[[tool.academic_figure_skills.skills]]
+name = "drawio-poster"
+path = "plugins/academic-figure-skills/skills/drawio-poster"
+version = "0.1.0"
+kind = "poster-overlay"
+base_skill_name = "drawio"
