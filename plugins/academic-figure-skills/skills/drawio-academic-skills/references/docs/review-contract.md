@@ -47,6 +47,12 @@ turn that into a publication-readability claim.
 
 ## Read, then compare
 
+For consequential task-specific ambiguities, use optional
+`contract.reader_questions` and `readback.answers` as described in
+`mechanism-readback.md`. Questions bind to existing object IDs and the reviewed
+context; strict review requires exact answer coverage and current observations.
+Legacy records without questions remain compatible. New rounds clear answers.
+
 Inspect the actual delivered primary artifact and caption before comparing the
 reading with the claims table. Record `readback.observations`: input/output,
 main path, line meanings, and inset correspondence (or an explicit no-inset
@@ -128,6 +134,10 @@ downgrades to review, resets visual/scientific status, and never overwrites the
 input or approves missing new reviews. Initialize and complete a new review.
 
 ## Verification boundary
+
+Use `figure_delivery.py` to aggregate strict validation into separate evidence
+layers and optionally compare a preserved previous review context. It neither
+replaces this lifecycle nor upgrades reviewer assertions into verified truth.
 
 Use `evals/test_figure_review.py` for deterministic contract regressions. Include
 positive and negative fixtures and a self-consistent semantically wrong claim

@@ -78,7 +78,7 @@ def review_skeleton(document: dict) -> dict:
         "readback": {"status": "not_checked", "method": "informed_self_check",
             "reviewer": "", "inputs": [], "artifact": context["visual_artifact"],
             "observations": {"input_output": "", "main_path": "", "line_meanings": "", "detail_mapping": ""},
-            "visual_assessment": "", "differences": [],
+            "visual_assessment": "", "differences": [], "answers": [],
             "viewing": {"mode": "draft_preview", "width_mm": None, "reason": ""}}}
 
 
@@ -193,6 +193,33 @@ def validate_review(record: Any, document: dict, *, finalizing: bool) -> list[di
     if covered != expected_ids:
         problem("review_claim_coverage", "claims must cover declared node/edge IDs exactly; grouping is allowed")
     readback = record["readback"]
+    # Optional task-specific questions live in the context-bound contract.
+    # Their answers are observations, never automatically inferred from claims.
+    questions = contract.get("reader_questions", [])
+    question_ids = set()
+    if not isinstance(questions, list):
+        problem("review_questions", "contract.reader_questions must be a list")
+        questions = []
+    for question in questions:
+        if (not isinstance(question, dict) or set(question) != {"id", "question", "object_ids"}
+                or not isinstance(question.get("id"), str) or not question["id"].strip()
+                or not isinstance(question.get("question"), str) or not question["question"].strip()
+                or not isinstance(question.get("object_ids"), list)
+                or not question["object_ids"] or any(not isinstance(x, str) or x not in expected_ids for x in question["object_ids"])):
+            problem("review_questions", "each reader question needs a stable ID, question and existing object IDs")
+            continue
+        if question["id"] in question_ids:
+            problem("review_questions", "duplicate reader question ID")
+        question_ids.add(question["id"])
+    answer_ids = set()
+    for answer in readback.get("answers", []):
+        if answer["id"] in answer_ids:
+            problem("review_answers", "duplicate reader answer ID")
+        answer_ids.add(answer["id"])
+        if answer["status"] != "pass" or not answer["observation"].strip():
+            problem("review_answers", "each reader question needs a current concrete observation")
+    if answer_ids != question_ids:
+        problem("review_answers", "readback answers must cover declared reader questions exactly")
     if readback["status"] != "pass" or not readback["reviewer"].strip() or not readback["visual_assessment"].strip() or any(not s.strip() for s in readback["observations"].values()):
         problem("review_readback", "record actual reading and visual assessment, including inapplicable inset explanations")
     if not {"artifact", "caption", "audience"}.issubset(readback["inputs"]):

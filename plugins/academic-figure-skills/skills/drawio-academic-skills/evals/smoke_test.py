@@ -19,6 +19,7 @@ from test_figure_geometry import FigureGeometryTests  # noqa: E402,F401
 from audit_figure_geometry import audit_svg as audit_geometry, digest as geometry_digest  # noqa: E402
 from test_audit_connectors import ConnectorAuditTests  # noqa: E402,F401
 from test_figure_review import FigureReviewTests, completed_review, bind_review  # noqa: E402,F401
+from test_figure_delivery import FigureDeliveryTests  # noqa: E402,F401
 from figure_manifest import (  # noqa: E402
     hydrate_artifacts,
     manifest_skeleton,

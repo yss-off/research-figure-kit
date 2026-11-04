@@ -109,6 +109,13 @@ never present schema validation as scientific or visual certification.
 
 ## Source Understanding
 
+For implementation-backed mechanism figures, overview/detail ambiguity, or
+repeated label/route complaints, read `references/docs/mechanism-readback.md`.
+Bind the important reader questions in the existing contract, answer from the
+actual export, and preserve them across revisions. Use `scripts/figure_delivery.py`
+to report current evidence layers and prior-context differences; its result is
+evidence completeness, never automatic scientific or visual approval.
+
 For overlay figures, follow `references/docs/review-contract.md`: maintain a
 claim–source–abstraction table before authoring, then record actual-artifact
 reading, source comparison and persistent issue history in `figure.review.json`.
@@ -246,5 +253,12 @@ Do not claim completion until:
 - complex-task manifest records the frozen semantic inventory, compared/selected layout, reference IDs, exact CLI commands, artifact hashes/evidence labels, deterministic/visual/publication QA, and residual risks; `pending` or `not_checked` is never reported as PASS
 
 ## Completion Report
+
+For manifest-backed delivery, run `python scripts/figure_delivery.py
+figure.manifest.json --output delivery.json --strict` and read its JSON before
+writing the completion claim. An incomplete diagnostic draft can still be shown;
+name its incomplete layers. Never turn a geometry PASS or successful report-write
+exit code into an overall visual/scientific PASS. Reuse this report rather than
+creating a parallel ad hoc acceptance record.
 
 End with a concise report: selected delivery class; editable, preview, and publication assets with paths; intermediate work directory and figure-manifest path when generated; sibling base CLI commands run; selected layout/reference IDs for complex tasks; publication renderer and pixel dimensions; the selected palette, its colorblind/grayscale safety flags, and any print-gate downgrade; the actual CJK font fallback when the requested font was unavailable; DOCX/PDF embedding checks; blocked publication exports; remaining venue-specific manual checks.

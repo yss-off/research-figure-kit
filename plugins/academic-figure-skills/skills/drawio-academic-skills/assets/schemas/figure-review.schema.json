@@ -268,6 +268,35 @@
             }
           },
           "additionalProperties": false
+        },
+        "answers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "observation",
+              "status"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "observation": {
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "not_checked",
+                  "pass",
+                  "review",
+                  "blocked"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
         }
       },
       "additionalProperties": false
