@@ -115,6 +115,89 @@ class FigureReviewTests(unittest.TestCase):
         self.assertEqual("not_checked", current["claims"][0]["status"])
         self.assertTrue(current["previous_review"]["sha256"])
 
+    def test_invalid_snapshots_rejected_across_history_round_and_comparison(self):
+        from figure_delivery import revision_impact
+        from _common import CliError
+        manifest = self.work / 'manifest.json'
+        manifest.write_text(json.dumps(self.doc))
+        bad_contexts = [{}, {'figure_id': self.doc['figure_id'], 'contract': {},
+            'semantic_inventory': {'nodes': [], 'edges': []}}]
+        for key in self.record['context']:
+            context = copy.deepcopy(self.record['context']); context.pop(key)
+            bad_contexts.append(context)
+        for key, value in (('sources', {}), ('artifacts', [None]),
+                           ('canonical_spec', {'path': '/old', 'sha256': 'invalid'}),
+                           ('visual_artifact', {'sha256': None}),
+                           ('semantic_inventory', {'nodes': [{'id': ''}], 'edges': []})):
+            context = copy.deepcopy(self.record['context']); context[key] = value
+            bad_contexts.append(context)
+        duplicate = copy.deepcopy(self.record['context'])
+        duplicate['semantic_inventory']['nodes'] *= 2
+        bad_contexts.append(duplicate)
+        wrong_id = copy.deepcopy(self.record['context']); wrong_id['figure_id'] = 'other'
+        bad_contexts.append(wrong_id)
+        for index, context in enumerate(bad_contexts):
+            with self.subTest(context=context):
+                previous = copy.deepcopy(self.record); previous['context'] = context
+                path = self.work / 'previous.json'; path.write_text(json.dumps(previous))
+                before = path.read_bytes()
+                with self.assertRaises(CliError):
+                    revision_impact(previous, self.doc)
+                current = copy.deepcopy(self.record)
+                current['previous_review'] = {'path': str(path), 'sha256': sha256_file(path)}
+                self.assertIn('review_history', self.codes(current))
+                output = self.work / f'next-{index}.json'
+                run = subprocess.run([sys.executable, str(ROOT / 'scripts/figure_review.py'),
+                    'start-round', str(manifest), str(path), '--output', str(output)],
+                    capture_output=True, text=True)
+                self.assertEqual(2, run.returncode, run.stdout)
+                self.assertNotIn('Traceback', run.stderr)
+                self.assertFalse(output.exists())
+                self.assertEqual(before, path.read_bytes())
+
+    def test_pending_snapshot_with_explicit_missing_evidence_can_start_round(self):
+        from figure_manifest import manifest_skeleton
+        from figure_review import start_review_round, revision_impact
+        doc = manifest_skeleton('draft', 'Draft', 'architecture')
+        previous = review_skeleton(doc)
+        self.assertIsNone(previous['context']['canonical_spec'])
+        path = self.work / 'pending.json'; path.write_text(json.dumps(previous))
+        current = start_review_round(doc, str(path))
+        self.assertEqual('pending', current['scope'])
+        self.assertEqual('not_checked', current['readback']['status'])
+        self.assertFalse(revision_impact(previous, doc)['requires_new_round'])
+        self.assertNotEqual([], validate_review(current, doc, finalizing=True))
+
+    def test_old_valid_snapshot_survives_missing_old_files_but_not_old_approval(self):
+        from figure_delivery import revision_impact
+        previous = copy.deepcopy(self.record)
+        issue = self.issue()
+        issue['events'].append({**issue['events'][0], 'state': 'closed',
+            'decision': 'Fixed', 'verification': 'Checked old export',
+            'artifacts': [previous['context']['visual_artifact']]})
+        previous['issues'] = [issue]
+        previous['readback']['answers'] = [{'id': 'old', 'observation': 'Old reading', 'status': 'pass'}]
+        # Historical files are not required for structural snapshot validation.
+        previous['context']['canonical_spec']['path'] = str(self.work / 'removed-old.yaml')
+        path = self.work / 'previous.json'; path.write_text(json.dumps(previous))
+        before = path.read_bytes()
+        self.doc['contract']['caption'] = 'Revised caption'
+        manifest = self.work / 'manifest.json'; manifest.write_text(json.dumps(self.doc))
+        output = self.work / 'new-round.json'
+        run = subprocess.run([sys.executable, str(ROOT / 'scripts/figure_review.py'),
+            'start-round', str(manifest), str(path), '--output', str(output)],
+            capture_output=True, text=True)
+        self.assertEqual(0, run.returncode, run.stderr)
+        current = json.loads(output.read_text())
+        self.assertEqual(previous['issues'], current['issues'])
+        self.assertEqual('not_checked', current['claims'][0]['status'])
+        self.assertEqual('', current['claims'][0]['comparison'])
+        self.assertEqual([], current['readback']['answers'])
+        self.assertEqual('not_checked', current['readback']['status'])
+        self.assertIn('review_issue_verification', self.codes(current))
+        self.assertTrue(revision_impact(previous, self.doc)['requires_new_round'])
+        self.assertEqual(before, path.read_bytes())
+
     def test_missing_claim_and_unknown_object_are_rejected(self):
         for ids in (["input"], ["input", "output", "support", "flow", "invented"]):
             r = copy.deepcopy(self.record); r["claims"][0]["object_ids"] = ids

@@ -19,6 +19,7 @@ from test_figure_geometry import FigureGeometryTests  # noqa: E402,F401
 from audit_figure_geometry import audit_svg as audit_geometry, digest as geometry_digest  # noqa: E402
 from test_audit_connectors import ConnectorAuditTests  # noqa: E402,F401
 from test_figure_review import FigureReviewTests, completed_review, bind_review  # noqa: E402,F401
+from test_figure_delivery import FigureDeliveryTests  # noqa: E402,F401
 from figure_manifest import (  # noqa: E402
     hydrate_artifacts,
     manifest_skeleton,
@@ -131,7 +132,7 @@ def accepted_manifest(drawio: Path, svg: Path) -> dict:
     document["qa"] = {
         "deterministic": {"status": "pass", "findings": []},
         "visual": {"status": "pass", "artifact": str(svg), "round": 1, "issues": []},
-        "publication": {"status": "pass", "checks": []},
+        "publication": {"status": "pass", "checks": ["Synthetic SVG preview inspected; no venue claim"]},
         "residual_risks": ["This is a structural fixture, not venue evidence."],
     }
     # Real minimal SVG geometry, not a self-declared successful receipt.
@@ -282,7 +283,10 @@ class ManifestTests(unittest.TestCase):
             "role": "svg", "path": str(self.work / "absent.svg"),
             "evidence_label": "missing-evidence",
         }]
-        self.assertEqual("pass", validate_manifest(document, verify_artifacts=True)["status"])
+        report = validate_manifest(document, verify_artifacts=True)
+        self.assertEqual("review", report["status"])
+        self.assertEqual(0, report["summary"]["errors"])
+        self.assertEqual(["publication_checks_missing"], [f["code"] for f in report["findings"]])
 
     def test_known_bad_manifest_cases(self) -> None:
         fixture = load_fixture("manifest-known-bad.json")

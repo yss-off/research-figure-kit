@@ -422,6 +422,21 @@
         "Does not require an external model or claim isolated reading for an informed author",
         "Reports contract tests, actual visual inspection and unmeasured reviewer effectiveness separately"
       ]
+    },
+    {
+      "id": "academic-mechanism-readback-pairs",
+      "prompt": "Review the supplied paired mechanism figures and captions at intended width. Report concrete defects and justified choices, then perform a label-only revision without changing scientific relations.",
+      "expected_output": "Evidence-bounded findings with correct controls retained, reader questions answered from actual exports, and revision changes checked.",
+      "files": [
+        "skills/drawio-academic-skills/evals/mechanism-review-cases.json"
+      ],
+      "assertions": [
+        "Distinguishes geometry coverage from reader comprehension",
+        "Does not impose universal centred ports or zero bends",
+        "Keeps fixed class identity distinct from learnable parameters",
+        "Reports detection, misses, false positives and unknowns only for cases actually inspected",
+        "Labels informed author self-check separately from independent evaluation"
+      ]
     }
   ]
 }
