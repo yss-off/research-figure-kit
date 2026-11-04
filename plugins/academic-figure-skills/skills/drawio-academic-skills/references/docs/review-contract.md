@@ -150,3 +150,33 @@ model-effectiveness evaluation needs pre-checked answers, correct controls,
 fixed captions and sizes, and separate detection/miss/false-positive/unknown
 results. Until measured, report "review effectiveness not measured". Contract
 PASS and one inspected figure are not evidence of a reduced miss rate.
+
+### Shared strict evidence decision
+
+`figure_manifest.py validate --strict` owns evidence completeness;
+`figure_delivery.py` presents the same findings and maps strict `pass` to
+`evidence_complete`. Deterministic, visual and publication status must be `pass`.
+Publication checks must be a nonempty list of nonblank observations, or objects
+with nonblank `name`, `evidence` and `status: pass`. Missing or invalid checks
+are warnings in diagnostic drafts and errors for strict/accepted validation.
+CLI exit codes remain distinct: manifest validation errors use 2, while incomplete
+strict delivery uses 1. Neither command certifies scientific or visual truth.
+
+### Review snapshot and round ownership
+
+`figure_review.py` owns snapshot validation, `start_review_round`, and
+`revision_impact`; delivery consumes the comparison without accessing schema
+validation internals. Starting a round, comparing revisions and verifying linked
+history apply the same saved-context checks: figure identity, all context fields,
+file-reference structure and unique node/edge IDs. Incomplete snapshots are rejected
+without changing them or synthesizing missing context. Existing complete 1.0 review
+records keep their format; schema version is unchanged.
+
+Historical references are checked as saved data, not reopened: an old export may
+have changed or disappeared. Draft snapshots may retain explicit null references
+or hashes for unavailable inputs; missing fields are not equivalent to null.
+Current acceptance still requires fresh evidence through strict review validation.
+
+A new round preserves issue events, copies claims as unchecked work, and clears
+claim comparisons and readback answers. Historical closed events remain intact;
+their old context-bound verification cannot certify a changed figure.

@@ -132,7 +132,7 @@ def accepted_manifest(drawio: Path, svg: Path) -> dict:
     document["qa"] = {
         "deterministic": {"status": "pass", "findings": []},
         "visual": {"status": "pass", "artifact": str(svg), "round": 1, "issues": []},
-        "publication": {"status": "pass", "checks": []},
+        "publication": {"status": "pass", "checks": ["Synthetic SVG preview inspected; no venue claim"]},
         "residual_risks": ["This is a structural fixture, not venue evidence."],
     }
     # Real minimal SVG geometry, not a self-declared successful receipt.
@@ -283,7 +283,10 @@ class ManifestTests(unittest.TestCase):
             "role": "svg", "path": str(self.work / "absent.svg"),
             "evidence_label": "missing-evidence",
         }]
-        self.assertEqual("pass", validate_manifest(document, verify_artifacts=True)["status"])
+        report = validate_manifest(document, verify_artifacts=True)
+        self.assertEqual("review", report["status"])
+        self.assertEqual(0, report["summary"]["errors"])
+        self.assertEqual(["publication_checks_missing"], [f["code"] for f in report["findings"]])
 
     def test_known_bad_manifest_cases(self) -> None:
         fixture = load_fixture("manifest-known-bad.json")

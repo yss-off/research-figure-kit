@@ -28,7 +28,210 @@
       ]
     },
     "context": {
-      "type": "object"
+      "type": "object",
+      "required": [
+        "figure_id",
+        "contract",
+        "semantic_inventory",
+        "canonical_spec",
+        "artifacts",
+        "sources",
+        "scientific_basis",
+        "visual_artifact"
+      ],
+      "properties": {
+        "figure_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "contract": {
+          "type": "object"
+        },
+        "semantic_inventory": {
+          "type": "object",
+          "required": [
+            "nodes",
+            "edges"
+          ],
+          "properties": {
+            "nodes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "id"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            },
+            "edges": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "id"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "canonical_spec": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sha256": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          "additionalProperties": false
+        },
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "role",
+              "file",
+              "text_mode"
+            ],
+            "properties": {
+              "role": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "file": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sha256": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "pattern": "^[a-f0-9]{64}$"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "text_mode": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "file",
+              "kind"
+            ],
+            "properties": {
+              "file": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sha256": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "pattern": "^[a-f0-9]{64}$"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "kind": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        },
+        "scientific_basis": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "visual_artifact": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sha256": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
     },
     "claims": {
       "type": "array",

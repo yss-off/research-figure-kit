@@ -7,48 +7,7 @@ from pathlib import Path
 
 from _common import CliError, atomic_write_json, emit_json, load_json, sha256_file
 from figure_manifest import validate_manifest
-from figure_review import SCHEMA_PATH, _schema_errors, current_context
-
-
-def revision_impact(previous: dict, document: dict) -> dict:
-    """Compare a preserved review snapshot, not mutable old source files."""
-    if _schema_errors(previous, load_json(SCHEMA_PATH)):
-        raise CliError("previous review has an invalid schema")
-    if previous["figure_id"] != document.get("figure_id"):
-        raise CliError("previous review belongs to another figure")
-    old = previous["context"]
-    new = current_context(document, strict=False)
-    for context in (old, new):
-        if (context.get("figure_id") != document.get("figure_id")
-                or not isinstance(context.get("contract"), dict)
-                or not isinstance(context.get("semantic_inventory"), dict)
-                or not all(isinstance(context["semantic_inventory"].get(k), list) for k in ("nodes", "edges"))):
-            raise CliError("revision context requires matching figure identity, contract and node/edge inventory")
-    changes = {}
-    for kind in ("nodes", "edges"):
-        def indexed(context):
-            rows = context.get("semantic_inventory", {}).get(kind, [])
-            if not isinstance(rows, list) or any(not isinstance(x, dict) or not isinstance(x.get("id"), str) for x in rows):
-                raise CliError("invalid inventory in revision comparison")
-            if len({x["id"] for x in rows}) != len(rows):
-                raise CliError("duplicate inventory IDs in revision comparison")
-            return {x["id"]: x for x in rows}
-        before, after = indexed(old), indexed(new)
-        changes[kind] = {
-            "added": sorted(after.keys() - before.keys()),
-            "removed": sorted(before.keys() - after.keys()),
-            "changed": sorted(k for k in before.keys() & after.keys() if before[k] != after[k]),
-        }
-    contract_keys = old.get("contract", {}).keys() | new.get("contract", {}).keys()
-    changed_context = sorted(k for k in old.keys() | new.keys() if old.get(k) != new.get(k))
-    return {
-        "changed_context": changed_context,
-        "contract_fields": sorted(k for k in contract_keys if old.get("contract", {}).get(k) != new.get("contract", {}).get(k)),
-        "inventory": changes,
-        "prior_issues": [{"id": i["id"], "objects": i["object_ids"], "state": i["events"][-1]["state"]} for i in previous["issues"]],
-        "requires_new_round": bool(changed_context),
-        "notice": "Inventory differences do not detect undeclared omissions or layout changes. Changed spec/export hashes require actual-artifact rechecking; this report never closes issues or carries PASS forward.",
-    }
+from figure_review import revision_impact
 
 
 def delivery_report(document: dict) -> dict:
@@ -61,18 +20,6 @@ def delivery_report(document: dict) -> dict:
     qa = document.get("qa") if isinstance(document.get("qa"), dict) else {}
     def record(name):
         return qa.get(name) if isinstance(qa.get(name), dict) else {}
-    checks = record("publication").get("checks")
-    if isinstance(checks, list):
-        for index, check in enumerate(checks):
-            valid = isinstance(check, str) and bool(check.strip())
-            if isinstance(check, dict):
-                valid = (check.get("status") == "pass"
-                    and all(isinstance(check.get(key), str) and check[key].strip()
-                            for key in ("name", "evidence")))
-            if not valid:
-                findings.append({"code": "publication_check_incomplete",
-                    "path": f"qa.publication.checks[{index}]", "severity": "error",
-                    "message": "Use a nonempty check observation, or name/status=pass/evidence; empty and unresolved entries are not completed checks."})
     def layer(scope, prefixes, present, declared=None):
         relevant = [f for f in findings if f["path"] in {"$", "qa"} or any(f["path"].startswith(p) for p in prefixes)]
         state = "not_checked" if not present else "review" if relevant or declared not in (None, "pass") else "evidence_checked"
@@ -93,8 +40,8 @@ def delivery_report(document: dict) -> dict:
             isinstance(record("publication").get("checks"), list) and bool(record("publication")["checks"]),
             record("publication").get("status", "not_checked")),
     }
-    # A report must not infer completion from the validator's exit status alone.
-    complete = validation["status"] == "pass" and all(x["status"] == "evidence_checked" for x in layers.values())
+    # Strict validation owns completeness; layers explain its evidence findings.
+    complete = validation["status"] == "pass"
     return {"schema_version": "1.0", "figure_id": document.get("figure_id"),
         "delivery_class": (document.get("contract") or {}).get("delivery_class") if isinstance(document.get("contract"), dict) else None,
         "status": "evidence_complete" if complete else "needs_review",

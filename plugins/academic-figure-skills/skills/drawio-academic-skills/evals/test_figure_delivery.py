@@ -10,7 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 from figure_delivery import delivery_report, revision_impact
-from figure_manifest import hydrate_artifacts, manifest_skeleton
+from figure_manifest import hydrate_artifacts, manifest_skeleton, validate_manifest
 from figure_review import review_skeleton
 from test_figure_review import completed_review, bind_review
 
@@ -65,6 +65,64 @@ class FigureDeliveryTests(unittest.TestCase):
         self.doc['qa']['publication']['checks'][0]['evidence'] = ''
         self.assertEqual('needs_review', delivery_report(self.doc)['status'])
 
+    def test_strict_and_delivery_share_evidence_decisions(self):
+        cases = [None, [], 'checked', [None], [' '], [{}], [True],
+                 ['Checked export', None],
+                 [{'name': 'fonts', 'status': 'blocked', 'evidence': 'missing'}],
+                 [{'name': 'fonts', 'status': 'pass', 'evidence': ''}],
+                 ['Inspected preview export'],
+                 [{'name': 'fonts', 'status': 'pass', 'evidence': 'Inspected preview'}]]
+        for checks in cases:
+            with self.subTest(checks=checks):
+                doc = copy.deepcopy(self.doc)
+                doc['qa']['publication']['checks'] = checks
+                strict = validate_manifest(doc, strict=True, verify_artifacts=True)
+                delivery = delivery_report(doc)
+                valid = checks in cases[-2:]
+                self.assertEqual('pass' if valid else 'fail', strict['status'])
+                self.assertEqual(strict['status'], delivery['validation_status'])
+                self.assertEqual(strict['findings'], delivery['findings'])
+                self.assertEqual(valid, delivery['status'] == 'evidence_complete')
+        for layer in ('deterministic', 'publication'):
+            for status in ('review', 'fail', 'blocked', 'pending', 'not_checked'):
+                with self.subTest(layer=layer, status=status):
+                    doc = copy.deepcopy(self.doc)
+                    doc['qa'][layer]['status'] = status
+                    strict = validate_manifest(doc, strict=True)
+                    self.assertEqual('fail', strict['status'])
+                    self.assertEqual(strict['findings'], delivery_report(doc)['findings'])
+
+    def test_draft_warns_but_accepted_requires_publication_evidence(self):
+        for missing in (True, False):
+            doc = copy.deepcopy(self.doc)
+            if missing:
+                doc['qa']['publication'].pop('checks')
+            else:
+                doc['qa']['publication']['checks'] = [None]
+            doc['status'] = 'review'
+            draft = validate_manifest(doc)
+            self.assertEqual('review', draft['status'])
+            self.assertTrue(any(f['path'].startswith('qa.publication.checks')
+                                and f['severity'] == 'warning' for f in draft['findings']))
+            doc['status'] = 'accepted'
+            self.assertEqual('fail', validate_manifest(doc)['status'])
+
+    def test_both_cli_entries_reject_incomplete_publication(self):
+        manifest = self.work / 'manifest.json'
+        for checks, valid in ((['Inspected preview'], True), ([None], False), ([], False)):
+            self.doc['qa']['publication']['checks'] = checks
+            manifest.write_text(json.dumps(self.doc))
+            before = manifest.read_bytes()
+            validation = subprocess.run([sys.executable, str(ROOT / 'scripts/figure_manifest.py'),
+                'validate', str(manifest), '--strict'], capture_output=True, text=True)
+            delivery = subprocess.run([sys.executable, str(ROOT / 'scripts/figure_delivery.py'),
+                str(manifest), '--strict'], capture_output=True, text=True)
+            self.assertEqual(0 if valid else 2, validation.returncode, validation.stderr)
+            self.assertEqual(0 if valid else 1, delivery.returncode, delivery.stderr)
+            self.assertEqual(json.loads(validation.stdout)['findings'],
+                             json.loads(delivery.stdout)['findings'])
+            self.assertEqual(before, manifest.read_bytes())
+
     def test_malformed_previous_context_returns_clean_cli_error(self):
         manifest = self.work / 'manifest.json'
         manifest.write_text(json.dumps(self.doc))
@@ -89,7 +147,11 @@ class FigureDeliveryTests(unittest.TestCase):
         self.assertIn('review_context_stale', {x['code'] for x in report['findings']})
         self.doc['contract']['caption'] = self.previous['context']['contract']['caption']
         self.svg.write_text(self.svg.read_text().replace("x='80'", "x='90'"))
-        self.assertEqual('needs_review', delivery_report(self.doc)['status'])
+        stale = validate_manifest(self.doc, strict=True, verify_artifacts=True)
+        delivery = delivery_report(self.doc)
+        self.assertEqual('fail', stale['status'])
+        self.assertEqual(stale['findings'], delivery['findings'])
+        self.assertEqual('needs_review', delivery['status'])
 
     def test_open_issue_hidden_from_visual_array_is_not_lost(self):
         r = copy.deepcopy(self.previous)
