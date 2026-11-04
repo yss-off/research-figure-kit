@@ -37,3 +37,32 @@ def test_independent_plugin_builds_are_identical(tmp_path: Path) -> None:
         assert manifest["version"] == receipt["version"]
         assert prefix + "skills/drawio-academic-skills/scripts/figure_delivery.py" in names
         assert not any("__pycache__" in name or name.endswith(".pyc") for name in names)
+
+
+def test_packages_ignore_host_write_permissions(tmp_path: Path) -> None:
+    # Equivalent sources with different owner/group access must yield the same ZIP.
+    sys.path.insert(0, str(ROOT / "tools"))
+    from package_plugin import build_plugin
+    from package_skill import SkillConfig, build_package
+
+    sources = []
+    for index, modes in enumerate(((0o600, 0o700), (0o664, 0o775))):
+        source = tmp_path / f"source-{index}"
+        source.mkdir()
+        for name, mode in zip(("data.txt", "run.sh"), modes):
+            file = source / name
+            file.write_text("same content\n")
+            file.chmod(mode)
+        sources.append(source)
+    for kind in ("plugin", "skill"):
+        packages = []
+        for index, source in enumerate(sources):
+            out = tmp_path / f"{kind}-{index}"
+            out.mkdir()
+            receipt = (build_plugin("fixture", "1.0", source, out) if kind == "plugin"
+                       else build_package(SkillConfig("fixture", "1.0", source, "fixture"), out))
+            packages.append(Path(receipt["path"]))
+        assert packages[0].read_bytes() == packages[1].read_bytes()
+        with zipfile.ZipFile(packages[0]) as archive:
+            assert archive.getinfo("fixture/data.txt").external_attr >> 16 == 0o644
+            assert archive.getinfo("fixture/run.sh").external_attr >> 16 == 0o755

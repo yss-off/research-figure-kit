@@ -58,6 +58,11 @@ def package_files(skill_root: Path) -> list[Path]:
     return sorted(files, key=lambda path: path.relative_to(skill_root).as_posix())
 
 
+def archive_permissions(source: Path) -> int:
+    """Preserve executability, not host-specific owner/group write permissions."""
+    return (0o755 if source.stat().st_mode & 0o111 else 0o644) << 16
+
+
 def sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
@@ -84,7 +89,7 @@ def build_package(config: SkillConfig, output_dir: Path) -> dict[str, object]:
                     f"{config.name}/{relative.as_posix()}", FIXED_TIMESTAMP
                 )
                 info.compress_type = zipfile.ZIP_DEFLATED
-                info.external_attr = (source.stat().st_mode & 0o777) << 16
+                info.external_attr = archive_permissions(source)
                 archive.writestr(info, source.read_bytes())
         os.replace(temporary, destination)
         destination.chmod(0o644)
