@@ -75,8 +75,8 @@ def _font_rc(font_mode: str) -> dict[str, Any]:
         return {
             "pdf.fonttype": 42,
             "ps.fonttype": 42,
-            # Editable SVG text; unlike PDF Type 42, this is not embedded.
-            "svg.fonttype": "none",
+            # Portable SVG outlines; PDF/PS still embed TrueType fonts.
+            "svg.fonttype": "path",
         }
     if font_mode == "paths":
         return {
