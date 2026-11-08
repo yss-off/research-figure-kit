@@ -178,7 +178,7 @@ The exporter refuses implicit overwrite, writes atomically, keeps vector DPI for
 For editable fonts:
 
 - PDF/PS Type 42 embeds TrueType fonts.
-- `svg.fonttype="none"` keeps text editable/searchable but does not embed fonts; appearance depends on installed fonts.
+- The exporter defaults to PDF/PS TrueType embedding and portable SVG outlines. For deliberately editable SVG, use `font_mode="current"` with `svg.fonttype="none"`; this does not embed fonts and appearance depends on installed fonts.
 - `svg.fonttype="path"` preserves glyph appearance as paths but loses editable/searchable text.
 
 Use an opaque explicit background unless transparency is required; blending against another background changes apparent contrast.
@@ -191,7 +191,18 @@ Read `references/visual_review.md` and keep three layers separate:
 2. **Textual:** check labels, units, caption, uncertainty, glyphs, and terminology.
 3. **Visual:** inspect the rendered preview at final size for clipping, overlap, occlusion, alignment, contrast, and redundant encoding.
 
-Run `scripts/font_preflight.py` before rendering CJK/math-heavy labels. Call `visual_qa.audit_figure(fig)` and render a preview before final export. Automated checks cover only declared properties and never establish scientific or visual correctness.
+For Chinese/English figures, default to **SimSun (宋体)** for Chinese and
+**Times New Roman** for Latin letters/digits unless the user or target specifies
+another typography. Use `scripts/bilingual_fonts.py:bilingual_serif_style` with
+explicit local font paths and all figure text; apply its returned rcParams in
+`rc_context` **before** creating artists. It fails when a required family or glyph
+is unavailable. Do not substitute Noto/DejaVu silently or redistribute font files.
+Times New Roman must precede SimSun in the fallback list so Latin uses the correct
+face. Record actual font paths. Check the rendered PNG and embedded PDF fonts;
+deliver SVG with outlined text for portability, keeping the plotting source.
+Editable SVG text is optional and must explicitly state its local font dependency.
+
+Run `scripts/font_preflight.py` before rendering CJK/math-heavy labels. Its generic coverage search is not proof that the requested font stack was used. Call `visual_qa.audit_figure(fig)` and render a preview before final export. Automated checks cover only declared properties and never establish scientific or visual correctness.
 
 Use the progress-based revision loop in `references/visual_review.md`; inspect final file metadata and, when supplied and in scope, the manuscript/web context. For a specified journal, compare against the relevant dated snapshot and live official guidance; re-check immediately before an authorized upload. For exploratory figures, finish with a provisional general profile and record publisher verification as pending or not applicable without blocking delivery.
 

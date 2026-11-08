@@ -105,6 +105,19 @@ class MatplotlibTests(unittest.TestCase):
             finally:
                 plt.close(fig)
 
+    def test_truetype_export_keeps_svg_portable(self) -> None:
+        from figure_export import _font_rc
+        self.assertEqual(_font_rc("truetype")["pdf.fonttype"], 42)
+        self.assertEqual(_font_rc("truetype")["svg.fonttype"], "path")
+        self.assertEqual(_font_rc("current"), {})
+
+    def test_bilingual_font_missing_family_fails(self) -> None:
+        from unittest.mock import patch
+        from bilingual_fonts import bilingual_serif_style
+        with patch("matplotlib.font_manager.findfont", side_effect=ValueError("missing")):
+            with self.assertRaisesRegex(ValueError, "Required font"):
+                bilingual_serif_style(text="中文 IoU")
+
     def test_font_preflight_has_concrete_paths(self) -> None:
         from font_preflight import preflight_fonts
 
