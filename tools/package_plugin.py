@@ -5,26 +5,19 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
-import tempfile
 import tomllib
-import zipfile
 from pathlib import Path
 
-from package_skill import FIXED_TIMESTAMP, archive_permissions, package_files, sha256
+from archive_utils import build_archive
+from project_config import load_project
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def plugin_metadata() -> tuple[str, str, Path]:
-    with (ROOT / "pyproject.toml").open("rb") as handle:
-        document = tomllib.load(handle)
-    project_version = document["project"]["version"]
-    record = document["tool"]["academic_figure_skills"]["plugin"]
-    name = record["name"]
-    version = record["version"]
-    path = (ROOT / record["path"]).resolve()
-    path.relative_to(ROOT)
+    project, plugin, _ = load_project(ROOT)
+    project_version = project["version"]
+    name, version, path = plugin.name, plugin.version, plugin.path
     if project_version != version:
         raise ValueError("plugin version must match project.version")
 
@@ -37,39 +30,8 @@ def plugin_metadata() -> tuple[str, str, Path]:
 
 
 def build_plugin(name: str, version: str, plugin_root: Path, output_dir: Path) -> dict[str, object]:
-    destination = output_dir / f"{name}-{version}.zip"
-    descriptor, temporary_name = tempfile.mkstemp(
-        prefix=f".{destination.name}.", suffix=".tmp", dir=output_dir
-    )
-    os.close(descriptor)
-    temporary = Path(temporary_name)
-    files = package_files(plugin_root)
-    try:
-        with zipfile.ZipFile(
-            temporary, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9
-        ) as archive:
-            for source in files:
-                relative = source.relative_to(plugin_root)
-                info = zipfile.ZipInfo(
-                    f"{name}/{relative.as_posix()}", FIXED_TIMESTAMP
-                )
-                info.compress_type = zipfile.ZIP_DEFLATED
-                info.external_attr = archive_permissions(source)
-                archive.writestr(info, source.read_bytes())
-        os.replace(temporary, destination)
-        destination.chmod(0o644)
-    finally:
-        try:
-            temporary.unlink()
-        except FileNotFoundError:
-            pass
-    return {
-        "plugin": name,
-        "version": version,
-        "path": str(destination),
-        "files": len(files),
-        "sha256": sha256(destination),
-    }
+    return {"plugin": name, "version": version,
+            **build_archive(name, version, plugin_root, output_dir)}
 
 
 def build_parser() -> argparse.ArgumentParser:

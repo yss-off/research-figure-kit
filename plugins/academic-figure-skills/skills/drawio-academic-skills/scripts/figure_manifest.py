@@ -19,6 +19,9 @@ from _common import (
     sha256_file,
 )
 
+from _validation import CheckExecution, Findings, LAYERS, ManifestEvaluation
+from _evidence import check_geometry, check_scientific, check_visual
+
 SCHEMA_VERSION = "1.1"
 FIGURE_TYPES = {"architecture", "workflow", "roadmap"}
 DELIVERY_CLASSES = {"raster-publication", "vector-submission", "draft-preview"}
@@ -441,10 +444,10 @@ def _validate_render(
     return roles
 
 
-def validate_manifest(
+def evaluate_manifest(
     document: dict[str, Any], *, strict: bool = False, verify_artifacts: bool = False
-) -> dict[str, Any]:
-    findings: list[dict[str, str]] = []
+) -> ManifestEvaluation:
+    findings = Findings()
     allowed_top = {
         "schema_version",
         "figure_id",
@@ -460,7 +463,7 @@ def validate_manifest(
     }
     unknown = set(document).difference(allowed_top)
     if unknown:
-        _finding(findings, "unknown_top_level", "$", f"unknown fields: {sorted(unknown)}")
+        _finding(findings.for_layers(*LAYERS), "unknown_top_level", "$", f"unknown fields: {sorted(unknown)}")
     if document.get("schema_version") not in {"1.0", SCHEMA_VERSION}:
         _finding(findings, "schema_version", "schema_version", "must equal 1.0 or 1.1")
     figure_id = document.get("figure_id")
@@ -527,10 +530,11 @@ def validate_manifest(
         findings,
         require_boundary_fields=finalizing,
     )
-    layout = _require_object(document, "layout", findings)
+    layout_findings = findings.for_layers("readability")
+    layout = _require_object(document, "layout", layout_findings)
     _validate_layout(
         layout,
-        findings,
+        layout_findings,
         require_wireframe_gate=finalizing,
     )
     references = _require_object(document, "reference_selection", findings)
@@ -557,17 +561,18 @@ def validate_manifest(
     artifacts = render.get("artifacts") if isinstance(render.get("artifacts"), list) else []
     # Invalid entries already have findings; do not dereference them below.
     artifacts = [item for item in artifacts if isinstance(item, dict)]
-    qa = _require_object(document, "qa", findings)
+    qa = _require_object(document, "qa", findings.for_layers(*LAYERS))
+    qa_layers = {"deterministic": "structure_export", "visual": "readability", "publication": "publication"}
     for layer in ("deterministic", "visual", "publication"):
         record = qa.get(layer)
         if not isinstance(record, dict) or record.get("status") not in QA_STATUSES:
-            _finding(findings, "qa_status", f"qa.{layer}.status", "has an unsupported status")
+            _finding(findings.for_layers(qa_layers[layer]), "qa_status", f"qa.{layer}.status", "has an unsupported status")
     # Evidence rules belong here; delivery only presents these findings.
     publication = qa.get("publication")
     checks = publication.get("checks") if isinstance(publication, dict) else None
     severity = "error" if finalizing else "warning"
     if not isinstance(checks, list) or not checks:
-        _finding(findings, "publication_checks_missing", "qa.publication.checks",
+        _finding(findings.for_layers("publication"), "publication_checks_missing", "qa.publication.checks",
                  "record a nonempty list of publication check observations", severity=severity)
     else:
         for index, check in enumerate(checks):
@@ -577,7 +582,7 @@ def validate_manifest(
                     and all(isinstance(check.get(key), str) and check[key].strip()
                             for key in ("name", "evidence")))
             if not valid:
-                _finding(findings, "publication_check_incomplete", f"qa.publication.checks[{index}]",
+                _finding(findings.for_layers("publication"), "publication_check_incomplete", f"qa.publication.checks[{index}]",
                          "Use a nonempty check observation, or name/status=pass/evidence; empty and unresolved entries are not completed checks.",
                          severity=severity)
     if not isinstance(qa.get("residual_risks"), list):
@@ -596,7 +601,7 @@ def validate_manifest(
 
     if finalizing:
         if not layout.get("selected_id"):
-            _finding(findings, "selected_layout_required", "layout.selected_id", "is required")
+            _finding(layout_findings, "selected_layout_required", "layout.selected_id", "is required")
         if not inventory.get("nodes"):
             _finding(findings, "semantic_nodes_required", "semantic_inventory.nodes", "must not be empty")
         if "drawio" not in roles or not roles.intersection({"svg", "png", "pdf"}):
@@ -640,7 +645,7 @@ def validate_manifest(
             layer_status = record.get("status") if isinstance(record, dict) else None
             if layer_status != "pass":
                 _finding(
-                    findings,
+                    findings.for_layers(qa_layers[layer]),
                     "qa_incomplete",
                     f"qa.{layer}.status",
                     f"must be pass for accepted/strict validation, got {layer_status!r}",
@@ -659,63 +664,45 @@ def validate_manifest(
             if item.get("evidence_label") != "missing-evidence" and not item.get("sha256"):
                 _finding(findings, "artifact_hash_missing", "render.artifacts", "accepted/strict delivery requires hashes for current delivered files")
 
-    # Geometry evidence is replayed for accepted/strict delivery, not inferred
-    # from a helper's PASS label. Ordinary diagnostic previews remain possible.
-    from audit_figure_geometry import verify_evidence
-    geometry = qa.get("geometry")
-    if not isinstance(geometry, dict) or not geometry:
-        if finalizing:
-            _finding(findings, "geometry_evidence_missing", "qa.geometry", "accepted/strict delivery requires a current replayable geometry audit")
-    else:
-        svg_path = geometry.get("svg") or next((x.get("path") for x in artifacts if x.get("role") == "svg"), None)
-        declared_svg = next((x.get("path") for x in artifacts if x.get("role") == "svg"), None)
-        messages = []
-        if not svg_path:
-            messages.append("geometry SVG input is missing")
-        else:
-            if declared_svg and Path(svg_path).resolve() != Path(declared_svg).resolve():
-                messages.append("geometry input differs from the delivered SVG")
-            messages.extend(verify_evidence(svg_path, geometry))
-        severity = "error" if finalizing else "warning"
-        for message in messages:
-            _finding(findings, "geometry_evidence_invalid", "qa.geometry", message, severity=severity)
-        if finalizing and svg_path and not messages:
-            try:
-                scene = load_json(geometry["scene"])
-                if {x["id"] for x in scene["nodes"]} != {x["id"] for x in inventory["nodes"]} or {x["id"] for x in scene["edges"]} != {x["id"] for x in inventory["edges"]}:
-                    _finding(findings, "geometry_inventory_mismatch", "qa.geometry", "scene IDs must cover the declared inventory exactly")
-                visual = qa.get("visual") or {}
-                if visual.get("status") != "pass" or visual.get("issues"):
-                    _finding(findings, "visual_review_incomplete", "qa.visual", "accepted/strict delivery requires closed visual findings and pass status")
-                if not visual.get("artifact") or visual.get("sha256") != sha256_file(visual["artifact"]):
-                    _finding(findings, "visual_review_stale", "qa.visual", "visual review must hash the actual inspected current artifact")
-                scientific = qa.get("scientific") or {}
-                if scientific.get("status") != "pass" or not scientific.get("basis") or scientific.get("svg_sha256") != sha256_file(svg_path):
-                    _finding(findings, "scientific_review_incomplete", "qa.scientific", "record the current scientific/semantic review basis separately from geometry")
-                sources = scientific.get("sources")
-                if not isinstance(sources, list) or not sources:
-                    _finding(findings, "scientific_sources_missing", "qa.scientific.sources", "record source evidence, or an explicit non-empirical contract file")
-                else:
-                    for source in sources:
-                        if source.get("sha256") != sha256_file(source["path"]):
-                            _finding(findings, "scientific_source_stale", "qa.scientific.sources", "a reviewed source changed")
-            except (OSError, ValueError, KeyError, CliError) as error:
-                _finding(findings, "review_evidence_unavailable", "qa", str(error))
-
+    # Each layer attempts its own checks, regardless of another layer's result.
+    checks = {
+        "structure_export": CheckExecution(
+            executed=["manifest structure"] + (["artifact verification"] if verify_artifacts or finalizing else []),
+            blocked=[] if verify_artifacts or finalizing else ["artifact verification not requested"]),
+        "publication": CheckExecution(executed=["delivery contract and observations"],
+                                      blocked=[] if finalizing else ["strict delivery checks not requested"]),
+        "geometry": check_geometry(qa.get("geometry"), artifacts, inventory,
+                                   findings.for_layers("geometry"), finalizing=finalizing),
+        "readability": check_visual(qa.get("visual"), findings.for_layers("readability"),
+                                    finalizing=finalizing),
+        "scientific": check_scientific(qa.get("scientific"), artifacts,
+                                       findings.for_layers("scientific"), finalizing=finalizing,
+                                       geometry_svg=qa["geometry"].get("svg") if isinstance(qa.get("geometry"), dict) else None),
+    }
     from figure_review import verify_review
-    findings.extend(verify_review(document, finalizing=finalizing))
+    findings.for_layers("scientific", "readability", "publication").extend(
+        verify_review(document, finalizing=finalizing))
     errors = sum(item["severity"] == "error" for item in findings)
     warnings = sum(item["severity"] == "warning" for item in findings)
-    return {
+    validation = {
         "schema_version": SCHEMA_VERSION,
         "status": "fail" if errors else ("review" if warnings else "pass"),
         "summary": {"errors": errors, "warnings": warnings},
-        "findings": findings,
+        "findings": findings.items,
         "notice": (
             "Manifest validation checks structure and recorded evidence only. It does "
             "not establish scientific correctness, copyright safety, or venue compliance."
         ),
     }
+
+    return ManifestEvaluation(validation, findings.by_layer, checks)
+
+
+def validate_manifest(
+    document: dict[str, Any], *, strict: bool = False, verify_artifacts: bool = False
+) -> dict[str, Any]:
+    """Stable public JSON contract; internal execution metadata stays private."""
+    return evaluate_manifest(document, strict=strict, verify_artifacts=verify_artifacts).validation
 
 
 def hydrate_artifacts(document: dict[str, Any]) -> dict[str, Any]:

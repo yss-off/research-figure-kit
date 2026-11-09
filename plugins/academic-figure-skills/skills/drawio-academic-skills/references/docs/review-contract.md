@@ -162,6 +162,15 @@ are warnings in diagnostic drafts and errors for strict/accepted validation.
 CLI exit codes remain distinct: manifest validation errors use 2, while incomplete
 strict delivery uses 1. Neither command certifies scientific or visual truth.
 
+Evidence layers attempt their independent checks even when another layer fails.
+Missing geometry does not skip visual-artifact or scientific-source hash checks.
+A layer is `evidence_checked` only when its required checks ran without unresolved
+inputs or findings; a stored `pass` flag alone is insufficient. Layer ownership
+and execution tracking are internal to validation; delivery presents the result
+without inferring ownership from finding-path prefixes. Public finding fields,
+manifest/review versions and CLI exit codes are unchanged.
+
+
 ### Review snapshot and round ownership
 
 `figure_review.py` owns snapshot validation, `start_review_round`, and

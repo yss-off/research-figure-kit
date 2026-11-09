@@ -6,37 +6,38 @@ import argparse
 from pathlib import Path
 
 from _common import CliError, atomic_write_json, emit_json, load_json, sha256_file
-from figure_manifest import validate_manifest
+from figure_manifest import evaluate_manifest
 from figure_review import revision_impact
 
 
 def delivery_report(document: dict) -> dict:
     """Always request strict replay, even for a diagnostic draft."""
+    evaluation = None
     try:
-        validation = validate_manifest(document, strict=True, verify_artifacts=True)
+        evaluation = evaluate_manifest(document, strict=True, verify_artifacts=True)
+        validation = evaluation.validation
     except (OSError, ValueError, KeyError, TypeError, AttributeError) as exc:
         validation = {"status": "fail", "findings": [{"code": "delivery_inputs_invalid", "path": "$", "severity": "error", "message": str(exc)}]}
     findings = validation["findings"]
     qa = document.get("qa") if isinstance(document.get("qa"), dict) else {}
     def record(name):
         return qa.get(name) if isinstance(qa.get(name), dict) else {}
-    def layer(scope, prefixes, present, declared=None):
-        relevant = [f for f in findings if f["path"] in {"$", "qa"} or any(f["path"].startswith(p) for p in prefixes)]
-        state = "not_checked" if not present else "review" if relevant or declared not in (None, "pass") else "evidence_checked"
+    def layer(name, scope, present, declared=None):
+        relevant = evaluation.findings_by_layer[name] if evaluation else findings
+        complete = evaluation is not None and evaluation.checks[name].complete
+        state = ("not_checked" if not present else "review" if relevant or declared not in (None, "pass")
+                 else "evidence_checked" if complete else "not_checked")
         return {"status": state, "recorded_status": declared, "scope": scope, "findings": relevant}
     layers = {
-        "structure_export": layer("Manifest structure and current delivered file hashes; not renderer parity.",
-            ("schema_version", "figure_id", "title", "status", "render", "contract", "semantic_inventory", "reference_selection", "provenance", "qa.deterministic"),
+        "structure_export": layer("structure_export", "Manifest structure and current delivered file hashes; not renderer parity.",
             bool(document.get("render")), record("deterministic").get("status", "not_checked")),
-        "geometry": layer("Replay of supported SVG geometry only; not route quality or aesthetic judgment.",
-            ("qa.geometry",), bool(record("geometry"))),
-        "scientific": layer("Current source/claim/review evidence associations; not independent scientific truth.",
-            ("qa.scientific", "qa.review"),
+        "geometry": layer("geometry", "Replay of supported SVG geometry only; not route quality or aesthetic judgment.",
+            bool(record("geometry"))),
+        "scientific": layer("scientific", "Current source/claim/review evidence associations; not independent scientific truth.",
             bool(record("scientific")) and bool(record("review")), record("scientific").get("status", "not_checked")),
-        "readability": layer("Recorded actual-artifact reading, visual assessment and issue history; reviewer effectiveness is unmeasured.",
-            ("qa.visual", "qa.review", "layout"), bool(record("review")), record("visual").get("status", "not_checked")),
-        "publication": layer("Recorded checks for the selected delivery class; not publisher acceptance or copyright clearance.",
-            ("qa.publication", "contract.delivery_class", "render", "qa.review"),
+        "readability": layer("readability", "Recorded actual-artifact reading, visual assessment and issue history; reviewer effectiveness is unmeasured.",
+            bool(record("review")), record("visual").get("status", "not_checked")),
+        "publication": layer("publication", "Recorded checks for the selected delivery class; not publisher acceptance or copyright clearance.",
             isinstance(record("publication").get("checks"), list) and bool(record("publication")["checks"]),
             record("publication").get("status", "not_checked")),
     }
