@@ -11,35 +11,16 @@ import subprocess
 import sys
 import tempfile
 import tomllib
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from project_config import PluginConfig, SkillConfig, load_project
+
 ROOT = Path(__file__).resolve().parents[1]
-PYPROJECT = ROOT / "pyproject.toml"
 
 
 class VerificationError(RuntimeError):
     """Raised when a project invariant or subprocess check fails."""
-
-
-@dataclass(frozen=True)
-class SkillConfig:
-    name: str
-    version: str
-    path: Path
-    kind: str
-    base_skill_name: str | None = None
-    source_url: str | None = None
-    source_commit: str | None = None
-
-
-@dataclass(frozen=True)
-class PluginConfig:
-    name: str
-    version: str
-    path: Path
-    marketplace_path: Path
 
 
 def run_checked(command: list[str], *, env: dict[str, str] | None = None) -> str:
@@ -57,86 +38,6 @@ def run_checked(command: list[str], *, env: dict[str, str] | None = None) -> str
             f"command failed ({result.returncode}): {' '.join(command)}\n{output}"
         )
     return output
-
-
-def resolve_project_path(relative_path: str, field: str) -> Path:
-    path = (ROOT / relative_path).resolve()
-    try:
-        path.relative_to(ROOT)
-    except ValueError as exc:
-        raise VerificationError(f"{field} must stay inside the project: {path}") from exc
-    return path
-
-
-def load_project() -> tuple[dict[str, Any], PluginConfig, list[SkillConfig]]:
-    with PYPROJECT.open("rb") as handle:
-        document = tomllib.load(handle)
-    project = document.get("project")
-    settings = document.get("tool", {}).get("academic_figure_skills")
-    if not isinstance(project, dict) or not isinstance(settings, dict):
-        raise VerificationError("pyproject.toml is missing project/tool metadata")
-    if not isinstance(project.get("version"), str) or not project["version"]:
-        raise VerificationError("project.version must be a non-empty string")
-    plugin_record = settings.get("plugin")
-    if not isinstance(plugin_record, dict):
-        raise VerificationError("tool.academic_figure_skills.plugin must be a table")
-    try:
-        plugin = PluginConfig(
-            name=plugin_record["name"],
-            version=plugin_record["version"],
-            path=resolve_project_path(plugin_record["path"], "plugin.path"),
-            marketplace_path=resolve_project_path(
-                plugin_record["marketplace_path"], "plugin.marketplace_path"
-            ),
-        )
-    except KeyError as exc:
-        raise VerificationError(f"plugin metadata is missing {exc.args[0]}") from exc
-    if not all(isinstance(value, str) and value for value in (plugin.name, plugin.version)):
-        raise VerificationError("plugin name and version must be non-empty strings")
-    records = settings.get("skills")
-    if not isinstance(records, list) or not records:
-        raise VerificationError("tool.academic_figure_skills.skills must be a non-empty list")
-
-    skills: list[SkillConfig] = []
-    for record in records:
-        if not isinstance(record, dict):
-            raise VerificationError("every configured skill must be a table")
-        try:
-            name = record["name"]
-            version = record["version"]
-            kind = record["kind"]
-            relative_path = record["path"]
-        except KeyError as exc:
-            raise VerificationError(f"configured skill is missing {exc.args[0]}") from exc
-        if not all(isinstance(value, str) and value for value in (name, version, kind, relative_path)):
-            raise VerificationError("skill name, version, kind, and path must be non-empty strings")
-        path = resolve_project_path(relative_path, "skill.path")
-        base_name = record.get("base_skill_name")
-        if base_name is not None and not isinstance(base_name, str):
-            raise VerificationError("base_skill_name must be a string when present")
-        source_url = record.get("source_url")
-        source_commit = record.get("source_commit")
-        if source_url is not None and not isinstance(source_url, str):
-            raise VerificationError("source_url must be a string when present")
-        if source_commit is not None and not isinstance(source_commit, str):
-            raise VerificationError("source_commit must be a string when present")
-        skills.append(
-            SkillConfig(
-                name,
-                version,
-                path,
-                kind,
-                base_name,
-                source_url,
-                source_commit,
-            )
-        )
-
-    if len({skill.name for skill in skills}) != len(skills):
-        raise VerificationError("configured skill names must be unique")
-    if len({skill.path for skill in skills}) != len(skills):
-        raise VerificationError("configured skill paths must be unique")
-    return project, plugin, skills
 
 
 def frontmatter_text(skill_root: Path) -> str:
@@ -456,7 +357,7 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
-        project, plugin, skills = load_project()
+        project, plugin, skills = load_project(ROOT)
         validate_project_files(plugin)
         validator = None if args.no_quick_validator else find_quick_validator(args.quick_validator)
         summary: dict[str, Any] = {

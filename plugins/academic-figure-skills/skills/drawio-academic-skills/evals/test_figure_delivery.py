@@ -44,6 +44,49 @@ class FigureDeliveryTests(unittest.TestCase):
         self.assertEqual('not_checked', report['layers']['readability']['status'])
         self.assertEqual('needs_review', report['status'])
 
+    def test_geometry_failure_does_not_hide_independent_evidence_errors(self):
+        for geometry in ({}, {**self.doc['qa']['geometry'], 'report': str(self.work / 'missing.json')}):
+            with self.subTest(geometry=geometry):
+                doc = copy.deepcopy(self.doc)
+                doc['qa']['geometry'] = geometry
+                doc['qa']['scientific']['svg_sha256'] = '0' * 64
+                doc['qa']['scientific']['sources'][0]['sha256'] = '0' * 64
+                doc['qa']['visual']['sha256'] = '0' * 64
+                report = delivery_report(doc)
+                codes = {item['code'] for item in report['findings']}
+                self.assertTrue({'scientific_review_incomplete', 'scientific_source_stale',
+                                 'visual_review_stale'} <= codes)
+                self.assertEqual('review', report['layers']['scientific']['status'])
+                self.assertEqual('review', report['layers']['readability']['status'])
+                self.assertEqual('needs_review', report['status'])
+                self.assertEqual(validate_manifest(doc, strict=True)['findings'], report['findings'])
+
+    def test_unavailable_visual_file_does_not_skip_scientific_checks(self):
+        doc = copy.deepcopy(self.doc)
+        doc['qa']['visual']['artifact'] = str(self.work / 'missing.png')
+        doc['qa']['scientific']['sources'][0]['sha256'] = '0' * 64
+        report = delivery_report(doc)
+        self.assertIn('scientific_source_stale', {f['code'] for f in report['findings']})
+        self.assertNotEqual('evidence_checked', report['layers']['readability']['status'])
+
+    def test_pdf_and_png_delivery_keep_diagnostic_geometry_svg(self):
+        from _common import sha256_file
+        for delivery_class, role in [('vector-submission', 'pdf'), ('raster-publication', 'png')]:
+            with self.subTest(delivery_class=delivery_class):
+                doc = copy.deepcopy(self.doc)
+                primary = self.work / f'synthetic-primary.{role}'
+                primary.write_bytes(b'Synthetic evidence-contract fixture; not publication content')
+                doc['contract']['delivery_class'] = delivery_class
+                doc['contract']['review_width_mm'] = 182
+                doc['render']['artifacts'] = [a for a in doc['render']['artifacts'] if a['role'] != 'svg']
+                doc['render']['artifacts'].append({'role': role, 'path': str(primary),
+                                                  'evidence_label': 'recorded-fixture'})
+                hydrate_artifacts(doc)
+                doc['qa']['visual'].update(artifact=str(primary), sha256=sha256_file(primary))
+                bind_review(doc, completed_review(doc), self.work / f'{role}.review.json')
+                report = delivery_report(doc)
+                self.assertEqual('evidence_complete', report['status'], report['findings'])
+
     def test_missing_publication_checks_are_not_inferred_from_pass_flag(self):
         self.doc['qa']['publication']['checks'] = []
         report = delivery_report(self.doc)

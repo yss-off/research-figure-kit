@@ -95,6 +95,7 @@ def validate_routing() -> dict[str, object]:
 
     return {
         "status": "pass",
+        "scope": "Gold case-set validation only; model routing was not evaluated.",
         "schema_version": document["schema_version"],
         "cases": len(cases),
         "counts": dict(sorted(counts.items())),
